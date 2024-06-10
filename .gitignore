@@ -1,1 +1,4 @@
 .env
+mongodb/mongo_data/*
+mosquitto/data/*
+app/__pycache__/*
