@@ -1,6 +1,5 @@
 db = db.getSiblingDB('admin');
 db.auth('root', 'toor');
-
 db = db.getSiblingDB('sensor_data');
 db.createUser({
   user: 'fastapi',
@@ -13,4 +12,4 @@ db.createUser({
   ],
 });
 
-db.createCollection('data');
+db.createCollection('temperature');
