@@ -28,6 +28,7 @@ services:
 
   mongo:
     image: mongo:latest
+    container_name: sensor-db
     ports:
       - "27017:27017"
     env_file:
@@ -42,5 +43,5 @@ services:
     volumes:
       - ./mongodb/mongo_data:/data/db
       - ./mongodb/init-mongo.js:/docker-entrypoint-initdb.d/init-mongo.js
-      
+
     restart: unless-stopped

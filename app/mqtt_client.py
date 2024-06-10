@@ -4,7 +4,7 @@ import datetime
 import paho.mqtt.client as mqtt
 
 from logger import logger
-# from database import data_collection
+from database import get_collection
 
 logger = logger.getChild("mqtt_client")
 
@@ -14,7 +14,7 @@ def on_connect(client, userdata, flags, reason_code, properties=None):
     else:
         logger.info("Connected to broker")
         client.subscribe("sensors/#")
-        
+
 def on_subscribe(client, userdata, mid, reason_code_list, properties=None):
     if reason_code_list[0].is_failure:
         logger.error(f"Failed to subscribe: {reason_code_list[0]}")
@@ -23,14 +23,14 @@ def on_subscribe(client, userdata, mid, reason_code_list, properties=None):
 
 def on_message(client, userdata, msg):
     logger.info(msg.topic + " " + str(msg.payload))
-    # data_collection = database.get_collection("temperature")
-    # # Save data to MongoDB
-    # data_entry = {
-    #     "device_id": 32,
-    #     "reading": msg.payload,
-    #     "timestamp": datetime.datetime.now()
-    # }
-    # data_collection.insert_one(data_entry)
+    data_collection = get_collection("temperature")
+    # Save data to MongoDB
+    data_entry = {
+        "device_id": 32,
+        "reading": msg.payload,
+        "timestamp": datetime.datetime.now()
+    }
+    data_collection.insert_one(data_entry)
 
 def start_mqtt_client():
     while True:

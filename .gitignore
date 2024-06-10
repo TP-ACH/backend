@@ -2,3 +2,6 @@
 mongodb/mongo_data/*
 mosquitto/data/*
 app/__pycache__/*
+.idea/
+
+app/error.log
