@@ -9,6 +9,10 @@
 ```
 cp .env.example .env
 ```
+- Crear el pwfile, el archivo donde se guardaran los usuarios de Mosquitto
+```
+touch mosquitto/config/pwfile
+```
 
 - Generar la DB para mosquitto. Usamos Sqlite3 porque es más facil y es poca data
 (Requiere tener instalado Sqlite3, apt install sqlite3)
