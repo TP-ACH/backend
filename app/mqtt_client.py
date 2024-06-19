@@ -4,6 +4,7 @@ import asyncio
 import datetime
 import paho.mqtt.client as mqtt
 
+from main import validator
 from logger import logger
 from database import get_collection
 
@@ -42,6 +43,7 @@ def on_message(client, userdata, msg):
         "timestamp": datetime.datetime.now()
     }
     data_collection.insert_one(data_entry)
+    # validator.validate(data_entry)
 
 
 def publish_message(topic, message):

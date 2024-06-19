@@ -1,0 +1,6 @@
+PH_MIN = 6.5
+PH_MAX = 7.5
+TEMP_MIN = 18
+TEMP_MAX = 22
+EC_MIN = 1.5
+EC_MAX = 2.5
