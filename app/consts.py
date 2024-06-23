@@ -1,6 +1,7 @@
-PH_MIN = 6.5
-PH_MAX = 7.5
-TEMP_MIN = 18
-TEMP_MAX = 22
-EC_MIN = 1.5
-EC_MAX = 2.5
+TEMP_TOPIC = 'sensors/temperature'
+PH_TOPIC = 'sensors/ph'
+EC_TOPIC = 'sensors/ec'
+PUMP_PH_UP_TOPIC = 'actuators/pumps/ph_up'
+PUMP_PH_DOWN_TOPIC = 'actuators/pumps/ph_down'
+PUMP_NUTRIENT_TOPIC = 'actuators/pumps/nutrient'
+SWITCH_LIGHT_TOPIC = 'actuators/light'
