@@ -1,5 +1,4 @@
 from fastapi import FastAPI, Response
-from fastapi.responses import FileResponse
 from database import validate_connection
 from mqtt_client import MQTTClient
 from consts import PUMP_PH_UP_TOPIC, PUMP_PH_DOWN_TOPIC, PUMP_NUTRIENT_TOPIC, \
@@ -17,6 +16,12 @@ async def startup_event():
         await validate_connection()
     except Exception as e:
         logger.error(f"Failed to connect to MongoDB: {e}")
+
+@app.on_event("shutdown")
+async def shutdown_event():
+    logger.info("Stopping MQTT client")
+    mqtt_client.client.loop_stop()
+    mqtt_client.client.disconnect()
 
 @app.get("/")
 def read_root():

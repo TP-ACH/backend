@@ -1,13 +1,11 @@
 import os
 import time
 import json
-import asyncio
-import datetime
 import paho.mqtt.client as mqtt
 
 from logger import logger
 from consts import TEMP_TOPIC, PH_TOPIC, EC_TOPIC
-from database import get_collection
+from database import insert_data
 
 logger = logger.getChild("mqtt_client")
 
@@ -36,14 +34,9 @@ def on_subscribe(client, userdata, mid, reason_code_list, properties=None):
 def on_message(client, userdata, msg):
     payload = msg.payload.decode("utf-8")
     sensor = msg.topic.split("/")[1]
-    logger.info(f"Received message from {sensor}: {payload}")
-    data_collection = get_collection(sensor)
-    data_entry = {
-        "device_id": 32,
-        "reading": payload,
-        "timestamp": datetime.datetime.now()
-    }
-    data_collection.insert_one(data_entry)
+    data = json.loads(payload)
+    logger.info(f"Received message from topic: {sensor}, device: {data['device_id']} and reading: {data['reading']}")
+    insert_data(data['device_id'], sensor, data['reading'])
 
 
 class MQTTClient:

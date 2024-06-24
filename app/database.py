@@ -1,5 +1,5 @@
 import os
-import asyncio
+import datetime
 from motor import motor_asyncio
 from logger import logger
 
@@ -24,6 +24,12 @@ async def validate_connection():
         logger.error(f"Failed to connect to MongoDB: {e}")
 
 
-
-def get_collection(collection_name: str):
-    return db.get_collection(collection_name)
+def insert_data(db, collection, reading):
+    db = mongo_client.get_database(db)
+    data_collection = db.get_collection(collection)
+    data_entry = {
+        "device_id": 32,
+        "reading": reading,
+        "timestamp": datetime.datetime.now()
+    }
+    data_collection.insert_one(data_entry)
