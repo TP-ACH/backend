@@ -30,6 +30,6 @@ def insert_data(db, collection, reading):
     data_entry = {
         "device_id": 32,
         "reading": reading,
-        "timestamp": datetime.datetime.now()
+        "created_at": datetime.datetime.now()
     }
     data_collection.insert_one(data_entry)

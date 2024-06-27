@@ -32,11 +32,23 @@ def on_subscribe(client, userdata, mid, reason_code_list, properties=None):
 
 
 def on_message(client, userdata, msg):
-    payload = msg.payload.decode("utf-8")
-    sensor = msg.topic.split("/")[1]
-    data = json.loads(payload)
-    logger.info(f"Received message from topic: {sensor}, device: {data['device_id']} and reading: {data['reading']}")
-    insert_data(data['device_id'], sensor, data['reading'])
+    try:
+        sensor = msg.topic.split("/")[1]
+        data = json.loads(msg.payload.decode("utf-8"))
+
+        device_id = str(data.get('device_id', None))
+        reading = float(data.get('reading', None))
+        if device_id and reading:
+            logger.info(f"Received message from topic: {sensor}, device: {data['device_id']} and reading: {data['reading']}")
+            insert_data(data['device_id'], sensor, data['reading'])
+        else:
+            logger.error(f"Invalid message received: {data}")
+
+    except ValueError:
+        logger.error(f"Failed to convert reading to float")
+    except Exception:
+        logger.error(f"Something went wrong, data received: {msg.payload}")
+    
 
 
 class MQTTClient:
