@@ -30,7 +30,7 @@ def read_root():
 
 
 @app.get("/data/{device_id}")
-async def get_data(device_id: str,
+async def get_device_data(device_id: str,
                    start_date: datetime.date | None = None,
                    end_date: datetime.date | None = None):
     query = {}
