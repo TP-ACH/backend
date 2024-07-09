@@ -12,7 +12,7 @@ MONGODB_DB = os.getenv("MONGO_INITDB_DATABASE")
 MONGODB_USER = os.getenv("MONGO_INITDB_USER")
 MONGODB_PASSWORD = os.getenv("MONGO_INITDB_PASSWORD")
 
-MONGODB_URI = f"mongodb://{MONGODB_USER}:{MONGODB_PASSWORD}@{MONGODB_HOST}:{MONGODB_PORT}/{MONGODB_DB}?retryWrites=true&w=majority"
+MONGODB_URI = f"mongodb://{MONGODB_USER}:{MONGODB_PASSWORD}@{MONGODB_HOST}:{MONGODB_PORT}/?authSource=admin&retryWrites=true&w=majority"
 
 mongo_client = motor_asyncio.AsyncIOMotorClient(MONGODB_URI)
 
