@@ -1,5 +1,6 @@
 from fastapi import FastAPI, Response
-from database import validate_connection
+import datetime
+from database import validate_connection, fetch_data
 from mqtt_client import MQTTClient
 from consts import PUMP_PH_UP_TOPIC, PUMP_PH_DOWN_TOPIC, PUMP_NUTRIENT_TOPIC, \
     SWITCH_LIGHT_TOPIC
@@ -26,6 +27,23 @@ async def shutdown_event():
 @app.get("/")
 def read_root():
     return {"Hello": "World"}
+
+
+@app.get("/data/{device_id}")
+async def get_device_data(device_id: str,
+                   start_date: datetime.date | None = None,
+                   end_date: datetime.date | None = None):
+    query = {}
+    if start_date:
+        start_date = datetime.datetime.combine(start_date, datetime.datetime.min.time())
+        query["created_at"] = {"$gte": start_date}
+    if end_date:
+        end_date = datetime.datetime.combine(end_date, datetime.datetime.max.time())
+        query["created_at"] = {"$lte": end_date}
+    
+    data_entries = await fetch_data(device_id, query)
+    return data_entries
+
 
 @app.get("/actuator/ph_up")
 def ph_up():

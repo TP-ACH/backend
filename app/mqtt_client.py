@@ -39,8 +39,8 @@ def on_message(client, userdata, msg):
         device_id = str(data.get('device_id', None))
         reading = float(data.get('reading', None))
         if device_id and reading:
-            logger.info(f"Received message from topic: {sensor}, device: {data['device_id']} and reading: {data['reading']}")
-            insert_data(data['device_id'], sensor, data['reading'])
+            logger.info(f"Received message from topic: {sensor}, device: {device_id} and reading: {reading}")
+            insert_data(device_id, sensor, reading)
         else:
             logger.error(f"Invalid message received: {data}")
 
