@@ -26,7 +26,6 @@ services:
       - ./mosquitto/data:/mosquitto/data:rw
       - ./mosquitto/log:/mosquitto/log:rw
     restart: unless-stopped
-
   mongo:
     image: mongo:latest
     container_name: mongodb

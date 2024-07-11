@@ -4,8 +4,9 @@ import json
 import paho.mqtt.client as mqtt
 
 from logger import logger
-from consts import TEMP_TOPIC, PH_TOPIC, EC_TOPIC
+from consts import TEMP_TOPIC, PH_TOPIC, EC_TOPIC, FLOATER_TOPIC
 from database import insert_data
+from ha_client import send_to_ha
 
 logger = logger.getChild("mqtt_client")
 
@@ -23,6 +24,7 @@ def on_connect(client, userdata, flags, reason_code, properties=None):
         client.subscribe(TEMP_TOPIC)
         client.subscribe(PH_TOPIC)
         client.subscribe(EC_TOPIC)
+        client.subscribe(FLOATER_TOPIC)
 
 def on_subscribe(client, userdata, mid, reason_code_list, properties=None):
     if reason_code_list[0].is_failure:
@@ -40,6 +42,7 @@ def on_message(client, userdata, msg):
         reading = float(data.get('reading', None))
         if device_id and reading:
             logger.info(f"Received message from topic: {sensor}, device: {device_id} and reading: {reading}")
+            send_to_ha(device_id, sensor, reading)
             insert_data(device_id, sensor, reading)
         else:
             logger.error(f"Invalid message received: {data}")

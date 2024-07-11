@@ -1,6 +1,8 @@
 TEMP_TOPIC = 'sensors/temperature'
 PH_TOPIC = 'sensors/ph'
 EC_TOPIC = 'sensors/ec'
+FLOATER_TOPIC = 'sensors/floater'
+PUMP_WATER_TOPIC = 'sensors/water'
 PUMP_PH_UP_TOPIC = 'actuators/pumps/ph_up'
 PUMP_PH_DOWN_TOPIC = 'actuators/pumps/ph_down'
 PUMP_NUTRIENT_TOPIC = 'actuators/pumps/nutrient'

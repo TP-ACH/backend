@@ -3,7 +3,7 @@ import datetime
 from database import validate_connection, fetch_data
 from mqtt_client import MQTTClient
 from consts import PUMP_PH_UP_TOPIC, PUMP_PH_DOWN_TOPIC, PUMP_NUTRIENT_TOPIC, \
-    SWITCH_LIGHT_TOPIC
+    SWITCH_LIGHT_TOPIC, PUMP_WATER_TOPIC
 from logger import logger
 
 app = FastAPI()
@@ -66,5 +66,11 @@ def nutrient_up():
 @app.get("/switch_light")
 def switch_light():
     if mqtt_client.client.publish(SWITCH_LIGHT_TOPIC, 1):
+        return Response(status_code=200, content="OK")
+    return Response(status_code=500, content="Failed to publish message")
+
+@app.post("/water_on")
+def water_on():
+    if mqtt_client.client.publish(PUMP_WATER_TOPIC, 1):
         return Response(status_code=200, content="OK")
     return Response(status_code=500, content="Failed to publish message")
