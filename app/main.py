@@ -84,6 +84,7 @@ async def fetch_and_save():
         automation = await get_automation_file()
         configuration = await get_configuration_file()
         # rompe al devovler pero guarda ni idea
+        print({"automations": automation, "configurations": configuration})
         return JSONResponse(status_code=200, content={"automations": automation, "configurations": configuration})
     except Exception as e:
         return Response(status_code=500, content=f"Failed to fetch ha files {e}")

@@ -62,6 +62,8 @@ async def get_automation_file():
         await insert_ha_data("homeassistant", "automations", automation_json)
     except Exception as e:
         logger.error(f"Failed to save automations to MongoDB: {e}")
+    for val in automation_json:
+        val.pop("_id")
     return automation_json
 
 async def get_configuration_file():
@@ -75,4 +77,6 @@ async def get_configuration_file():
         await insert_ha_data("homeassistant", "configurations", configurations_json)
     except Exception as e:
         logger.error(f"Failed to save configurations to MongoDB: {e}")
+    for val in configurations_json:
+        val.pop("_id")
     return configurations_json
