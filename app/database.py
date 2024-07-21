@@ -34,6 +34,12 @@ def insert_data(db_name, collection, reading):
     }
     data_collection.insert_one(data_entry)
 
+
+async def insert_ha_data(db_name, collection, data):
+    db = mongo_client.get_database(db_name)
+    data_collection = db.get_collection(collection)
+    await data_collection.insert_many(data)
+
 async def fetch_data(device_id: str, query: Dict):
     db = mongo_client.get_database(device_id)
     collection_names = await db.list_collection_names()

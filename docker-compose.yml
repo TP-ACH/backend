@@ -10,9 +10,11 @@ services:
       - PYTHONUNBUFFERED=1
     volumes:
       - ./app:/app
+      - /config:/config
     depends_on:
       - mqtt5
       - mongo
+      - homeassistant
     restart: unless-stopped
 
   mqtt5:
@@ -34,8 +36,6 @@ services:
       - /config:/config
       - /etc/localtime:/etc/localtime:ro
       - /run/dbus:/run/dbus:ro
-    depends_on: 
-      - fastapi
     ports:
     - "8123:8123"
     restart: unless-stopped
@@ -55,3 +55,5 @@ services:
       - ./mongodb/init-mongo.js:/docker-entrypoint-initdb.d/init-mongo.js
 
     restart: unless-stopped
+volumes:
+  config:

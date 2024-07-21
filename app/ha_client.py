@@ -1,11 +1,17 @@
 import os
 import requests
 import json
+import yaml
 
+
+from ruamel.yaml import YAML
 from logger import logger
-
+from database import insert_ha_data
+from models import automation, configuration
 
 HA_BASE_URL = os.getenv("HA_URL")
+ya = YAML()
+ya.preserve_quotes = True
 
 
 HEADERS = {
@@ -41,3 +47,32 @@ def send_to_ha(device_id: str, sensor: str, reading: float):
 
     except Exception as e:
         logger.error(f"Something went wrong when sending to HA: {str(e)}")
+
+async def get_automation_file():
+    logger.info("Gettin automations from Home Assistant container")
+    with open('../config/automations.yaml', 'r') as f:
+        contents = f.read()
+    data = yaml.safe_load(contents)
+    automations = [automation.Automation(**item) for item in data]
+    
+    # Convert to JSON and save to MongoDB
+    automation_json = [automation.model_dump() for automation in automations]
+    logger.info("Saving automations to MongoDB")
+    try:
+        await insert_ha_data("homeassistant", "automations", automation_json)
+    except Exception as e:
+        logger.error(f"Failed to save automations to MongoDB: {e}")
+    return automation_json
+
+async def get_configuration_file():
+    logger.info("Getting configuration.yaml file from Home Assistant container")
+    with open('../config/configuration.yaml', 'r') as file:
+        yaml_content = ya.load(file)
+    # Convert to JSON and save to MongoDB
+    configurations_json = [configuration.Configuration(**yaml_content).model_dump()]
+    logger.info("Saving automations to MongoDB")
+    try:
+        await insert_ha_data("homeassistant", "configurations", configurations_json)
+    except Exception as e:
+        logger.error(f"Failed to save configurations to MongoDB: {e}")
+    return configurations_json
