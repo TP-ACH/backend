@@ -1,24 +1,24 @@
 import os
 import requests
+import json
 
 from logger import logger
 
 
 HA_BASE_URL = os.getenv("HA_URL")
 
-HA_TOPIC = {
-    "temperature": "",
-    "ph": "",
-    "ec": "",
-    "humidity": "",
-    "room_temperature": "",
-    "floater": "-Py0_tP3ybDyV-O2IOiIQNDpe"
-}
 
 HEADERS = {
     "Content-Type": "application/json"
 }
 def send_to_ha(device_id: str, sensor: str, reading: float):
+    HA_TOPIC = {}
+    try:
+        with open('ha_endpoints.json', 'r') as file:
+            HA_TOPIC = json.load(file)
+            logger.info(f"ha topic endpoints: {HA_TOPIC}");
+    except Exception as e:
+        logger.error(f"error reading json file with HA endpoints");
     try:
         # Construct the URL
         url = HA_BASE_URL + HA_TOPIC[sensor]
