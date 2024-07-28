@@ -18,6 +18,7 @@ mongo_client = motor_asyncio.AsyncIOMotorClient(MONGODB_URI)
 
 async def validate_connection():
     try:
+        logger.info(MONGODB_URI);
         info = await mongo_client.server_info()
         logger.info(f"Connected to MongoDB: {info}")
     except Exception as e:

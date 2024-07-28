@@ -27,6 +27,19 @@ services:
       - ./mosquitto/log:/mosquitto/log:rw
     restart: unless-stopped
 
+  homeassistant:
+    container_name: homeassistant
+    image: "ghcr.io/home-assistant/home-assistant:stable"
+    volumes:
+      - /config:/config
+      - /etc/localtime:/etc/localtime:ro
+      - /run/dbus:/run/dbus:ro
+    depends_on: 
+      - fastapi
+    ports:
+    - "8123:8123"
+    restart: unless-stopped
+
   mongo:
     image: mongo:latest
     container_name: mongodb
