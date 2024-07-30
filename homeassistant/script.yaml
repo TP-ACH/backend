@@ -1,0 +1,20 @@
+water_check:
+  alias: water_check
+  sequence:
+    - service: logbook.log
+      data:
+        name: "Water check script log:"
+        message: >-
+          {% set floater_upper = state_attr('sensor.floater', 'upper') %}
+          {% set floater_lower = state_attr('sensor.floater', 'lower') %}
+          The water level thresholds are {{ floater_lower }} to {{ floater_upper }}.
+    - condition: template
+      value_template: >
+        {% set upper = state_attr('sensor.floater', 'upper') | int %}
+        {% set lower = state_attr('sensor.floater', 'lower') | int %}
+        {{ lower < reading | int <= upper }}
+    - service: todo.add_item
+      data:
+        item: "{{ reading }}"
+      target:
+        entity_id: todo.lista_de_la_compra

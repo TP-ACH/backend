@@ -1,0 +1,3 @@
+- water_on:
+  url: http://fastapi:8000/water_on
+  method: POST
