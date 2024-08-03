@@ -61,7 +61,7 @@ async def get_automation_file():
         logger.error(f"Failed to save automations to MongoDB: {e}")
     for val in automation_json:
         val.pop("_id")
-    return automation_json
+    return automations
 
 async def get_template_file():
     logger.info("Getting templates.yaml file from Home Assistant container")
@@ -79,7 +79,7 @@ async def get_template_file():
         logger.error(f"Failed to save templates to MongoDB: {e}")
     for val in template_json:
         val.pop("_id")
-    return template_json
+    return templates
 
 
 async def get_rest_command_file():
@@ -104,7 +104,7 @@ async def get_rest_command_file():
         logger.error(f"Failed to save rest_commands to MongoDB: {e}")
     for val in rest_command_json:
         val.pop("_id")
-    return rest_command_json
+    return rest_commands
 
 
 async def get_script_file():
@@ -126,5 +126,25 @@ async def get_script_file():
         logger.error(f"Failed to save scripts to MongoDB: {e}")
     for val in script_json:
         val.pop("_id")
-    return script_json
+    return scrpts
 
+async def get_homeassistant_config_files():
+    automations = [a.model_dump() for a in await get_automation_file()]
+    templates = [t.model_dump() for t in await get_template_file()]
+    rest_commands = [r.model_dump() for r in await get_rest_command_file()]
+    scripts = [s.model_dump() for s in await get_script_file()]
+    return [automations, templates, rest_commands, scripts]
+
+
+async def modify_ph_threshold(attribute: template.Attribute):
+    logger.info("Modifying PH threshold in Home Assistant to upper: {attribute.upper} and lower: {attribute.lower}")
+    templates = await get_template_file()
+    for t in templates:
+        for sensor in t.sensor:
+            if sensor.name == "ph":
+                sensor.attributes.upper = attribute.upper
+                sensor.attributes.lower = attribute.lower
+    data = [template.model_dump() for template in templates]
+    logger.info("Saving modified templates to Home Assistant")
+    with open('../config/templates.yaml', 'w') as f:
+        yaml.dump(data, f)
