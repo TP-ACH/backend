@@ -6,7 +6,7 @@ from mqtt_client import MQTTClient
 from consts import PUMP_PH_UP_TOPIC, PUMP_PH_DOWN_TOPIC, PUMP_NUTRIENT_TOPIC, \
     SWITCH_LIGHT_TOPIC, PUMP_WATER_TOPIC
 from logger import logger
-from ha_client import get_automation_file, get_configuration_file
+from ha_client import get_automation_file, get_script_file, get_rest_command_file, get_template_file
 
 app = FastAPI()
 mqtt_client = MQTTClient()
@@ -82,9 +82,11 @@ def water_on():
 async def fetch_and_save():
     try:
         automation = await get_automation_file()
-        configuration = await get_configuration_file()
+        script = await get_script_file()
+        rest_command = await get_rest_command_file()
+        template = await get_template_file()
         # rompe al devovler pero guarda ni idea
-        print({"automations": automation, "configurations": configuration})
-        return JSONResponse(status_code=200, content={"automations": automation, "configurations": configuration})
+        print({"automations": automation, "scripts": script, "rest_commands": rest_command, "templates": template})
+        return JSONResponse(status_code=200, content={"automations": automation, "scripts": script, "rest_commands": rest_command, "templates": template})
     except Exception as e:
         return Response(status_code=500, content=f"Failed to fetch ha files {e}")

@@ -1,5 +1,5 @@
 from pydantic import BaseModel
-from typing import List, Optional, Dict
+from typing import List, Optional, Dict, Tuple
 
 class Trigger(BaseModel):
     platform: str
@@ -9,8 +9,7 @@ class Trigger(BaseModel):
 
 class Action(BaseModel):
     service: str
-    enabled: bool
-    data: Dict
+    data: Dict[str, str]
 
 class Automation(BaseModel):
     id: str

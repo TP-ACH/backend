@@ -3,12 +3,13 @@
     unique_id: 99e212df-bfe9-4d44-ad02-a9ca1a5b99a4
     state: ""
     attributes:
-      upper: 7.5
-      lower: 6.5
+      upper: "7.5"
+      lower: "6.5"
   - name: floater
     unique_id: e87be260-dddb-4161-a4f0-3ddb3fbc6168
     state: ""
     attributes:
-      upper: 1
-      lower: 0
+      upper: "1"
+      lower: "0"
+      
 
