@@ -8,3 +8,5 @@ app/error.log
 mosquitto/config/pwfile
 
 app/models/
+
+error.log

@@ -1,0 +1,16 @@
+- id: '1720635200605'
+  alias: Water check
+  description: 'check water level and turn pump'
+  trigger:
+  - platform: webhook
+    allowed_methods:
+    - POST
+    - PUT
+    local_only: true
+    webhook_id: -Py0_tP3ybDyV-O2IOiIQNDpe
+  condition: []
+  action:
+  - service: script.water_check 
+    data:
+      reading: '{{ trigger.json.reading | int }}'
+  mode: single

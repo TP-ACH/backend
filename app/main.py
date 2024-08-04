@@ -1,10 +1,13 @@
 from fastapi import FastAPI, Response
+from fastapi.responses import JSONResponse
 import datetime
 from database import validate_connection, fetch_data
 from mqtt_client import MQTTClient
 from consts import PUMP_PH_UP_TOPIC, PUMP_PH_DOWN_TOPIC, PUMP_NUTRIENT_TOPIC, \
     SWITCH_LIGHT_TOPIC, PUMP_WATER_TOPIC
 from logger import logger
+from ha_client import get_homeassistant_config_files, modify_ph_threshold
+from models.template import Attribute
 
 app = FastAPI()
 mqtt_client = MQTTClient()
@@ -74,3 +77,20 @@ def water_on():
     if mqtt_client.client.publish(PUMP_WATER_TOPIC, 1):
         return Response(status_code=200, content="OK")
     return Response(status_code=500, content="Failed to publish message")
+
+
+@app.get("/fetch_and_save_ha_files")
+async def fetch_and_save():
+    try:
+        config_files = await get_homeassistant_config_files()
+        return JSONResponse(status_code=200, content=config_files)
+    except Exception as e:
+        return Response(status_code=500, content=f"Failed to fetch ha files {e}")
+    
+@app.post("/modify_threshold/ph")
+async def modify_threshold_ph(attribute: Attribute):
+    try:
+        await modify_ph_threshold(attribute)
+        return JSONResponse(status_code=200, content={"message": "Threshold modified successfully"})
+    except Exception as e:
+        return Response(status_code=500, content=f"Failed to modify threshold {e}")
