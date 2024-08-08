@@ -2,7 +2,7 @@ import os
 import datetime
 from typing import Dict
 from motor import motor_asyncio
-from logger import logger
+from utils.logger import logger
 
 logger.getChild("database")
 # MongoDB connection

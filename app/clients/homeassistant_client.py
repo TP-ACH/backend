@@ -4,8 +4,8 @@ import json
 import yaml
 
 
-from logger import logger
-from database import insert_ha_data
+from utils.logger import logger
+from clients.mongodb_client import insert_ha_data
 from models import automation, template, rest_command, script
 
 HA_BASE_URL = os.getenv("HA_URL")

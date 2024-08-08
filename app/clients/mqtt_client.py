@@ -3,10 +3,10 @@ import time
 import json
 import paho.mqtt.client as mqtt
 
-from logger import logger
-from consts import TEMP_TOPIC, PH_TOPIC, EC_TOPIC, FLOATER_TOPIC
-from database import insert_data
-from ha_client import send_to_ha
+from utils.logger import logger
+from utils.consts import TEMP_TOPIC, PH_TOPIC, EC_TOPIC, FLOATER_TOPIC
+from clients.mongodb_client import insert_data
+from clients.homeassistant_client import send_to_ha
 
 
 logger = logger.getChild("mqtt_client")
@@ -52,7 +52,6 @@ def on_message(client, userdata, msg):
         logger.error(f"Failed to convert reading to float")
     except Exception:
         logger.error(f"Something went wrong, data received: {msg.payload}")
-    
 
 
 class MQTTClient:
