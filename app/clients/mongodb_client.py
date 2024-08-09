@@ -2,7 +2,7 @@ import os
 import datetime
 from typing import Dict
 from motor import motor_asyncio
-from logger import logger
+from utils.logger import logger
 
 logger.getChild("database")
 # MongoDB connection
@@ -18,6 +18,7 @@ mongo_client = motor_asyncio.AsyncIOMotorClient(MONGODB_URI)
 
 async def validate_connection():
     try:
+        logger.info(MONGODB_URI)
         info = await mongo_client.server_info()
         logger.info(f"Connected to MongoDB: {info}")
     except Exception as e:
@@ -32,6 +33,12 @@ def insert_data(db_name, collection, reading):
         "created_at": datetime.datetime.now()
     }
     data_collection.insert_one(data_entry)
+
+
+async def insert_ha_data(db_name, collection, data):
+    db = mongo_client.get_database(db_name)
+    data_collection = db.get_collection(collection)
+    await data_collection.insert_many(data)
 
 async def fetch_data(device_id: str, query: Dict):
     db = mongo_client.get_database(device_id)

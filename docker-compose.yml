@@ -10,9 +10,11 @@ services:
       - PYTHONUNBUFFERED=1
     volumes:
       - ./app:/app
+      - /config:/config
     depends_on:
       - mqtt5
       - mongo
+      - homeassistant
     restart: unless-stopped
 
   mqtt5:
@@ -25,6 +27,17 @@ services:
       - ./mosquitto/config:/mosquitto/config:rw
       - ./mosquitto/data:/mosquitto/data:rw
       - ./mosquitto/log:/mosquitto/log:rw
+    restart: unless-stopped
+
+  homeassistant:
+    container_name: homeassistant
+    image: "ghcr.io/home-assistant/home-assistant:stable"
+    volumes:
+      - /config:/config
+      - /etc/localtime:/etc/localtime:ro
+      - /run/dbus:/run/dbus:ro
+    ports:
+    - "8123:8123"
     restart: unless-stopped
 
   mongo:
@@ -42,3 +55,5 @@ services:
       - ./mongodb/init-mongo.js:/docker-entrypoint-initdb.d/init-mongo.js
 
     restart: unless-stopped
+volumes:
+  config:

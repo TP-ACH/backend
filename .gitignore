@@ -6,3 +6,14 @@ app/__pycache__/*
 
 app/error.log
 mosquitto/config/pwfile
+
+app/models/__pycache__/*
+app/utils/__pycache__/*
+app/controllers/__pycache__/*
+app/clients/__pycache__/*
+
+error.log
+
+app/clients/__pycache__/
+
+app/controllers/__pycache__/
