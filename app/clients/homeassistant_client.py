@@ -4,8 +4,8 @@ import json
 import yaml
 
 
-from logger import logger
-from database import insert_ha_data
+from utils.logger import logger
+from clients.mongodb_client import insert_ha_data
 from models import automation, template, rest_command, script
 
 HA_BASE_URL = os.getenv("HA_URL")
@@ -18,9 +18,9 @@ def send_to_ha(device_id: str, sensor: str, reading: float):
     try:
         with open('ha_endpoints.json', 'r') as file:
             HA_TOPIC = json.load(file)
-            logger.info(f"ha topic endpoints: {HA_TOPIC}");
+            logger.info(f"ha topic endpoints: {HA_TOPIC}")
     except Exception as e:
-        logger.error(f"error reading json file with HA endpoints");
+        logger.error(f"error reading json file with HA endpoints")
     try:
         # Construct the URL
         url = HA_BASE_URL + HA_TOPIC[sensor]
