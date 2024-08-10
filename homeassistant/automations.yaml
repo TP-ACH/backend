@@ -14,3 +14,100 @@
     data:
       reading: '{{ trigger.json.reading | int }}'
   mode: single
+- id: '1320235203445'
+  alias: EC check
+  description: 'check EC and turn water or nute pump'
+  trigger:
+  - platform: webhook
+    allowed_methods:
+    - POST
+    - PUT
+    local_only: true
+    webhook_id: -Py0_tG3yHDyD-O2IOiIQNDpe
+  condition: []
+  action:
+  - service: script.ec_check 
+    data:
+      reading: '{{ trigger.json.reading | int }}'
+  mode: single
+- id: '1210255273445'
+  alias: Room Temperature alarm
+  description: 'check room temperature and trigger an alarm'
+  trigger:
+  - platform: webhook
+    allowed_methods:
+    - POST
+    - PUT
+    local_only: true
+    webhook_id: -Xs0_tG3yFAyD-O2IOiEQNDpe
+  condition: []
+  action:
+  - service: script.room_temperature_alarm 
+    data:
+      reading: '{{ trigger.json.reading | int }}'
+  mode: single
+- id: '1910241274445'
+  alias: Water Temperature alarm
+  description: 'check water temperature and trigger an alarm'
+  trigger:
+  - platform: webhook
+    allowed_methods:
+    - POST
+    - PUT
+    local_only: true
+    webhook_id: -Xd0_fG3yFAyD-22IEiEQNDpe
+  condition: []
+  action:
+  - service: script.temperature_alarm 
+    data:
+      reading: '{{ trigger.json.reading | int }}'
+  mode: single
+- id: '1210231574625'
+  alias: Humidity alarm
+  description: 'check humidity and trigger an alarm'
+  trigger:
+  - platform: webhook
+    allowed_methods:
+    - POST
+    - PUT
+    local_only: true
+    webhook_id: -Yd0_fGSyFAyD-11IEiEQNDpe
+  condition: []
+  action:
+  - service: script.humidity_alarm 
+    data:
+      reading: '{{ trigger.json.reading | int }}'
+  mode: single
+- id: '1010221554625'
+  alias: pH check
+  description: 'check pH and turn base or acid pump'
+  trigger:
+  - platform: webhook
+    allowed_methods:
+    - POST
+    - PUT
+    local_only: true
+    webhook_id: -Ed0_fDSyEAyD-35OEiEBNDpe
+  condition: []
+  action:
+  - service: script.ph_check 
+    data:
+      reading: '{{ trigger.json.reading | int }}'
+  mode: single
+- id: '1812331554625'
+  alias: light cycle
+  description: 'automation for light cycle'
+  trigger:
+  - platform: webhook
+    allowed_methods:
+    - POST
+    - PUT
+    local_only: true
+    webhook_id: -Bd0_fDSyAAyD-32OEiEFNDpe
+  condition: []
+  action:
+  - service: script.light_cycle 
+    data:
+      reading: '{{ trigger.json.reading | int }}'
+  mode: single
+

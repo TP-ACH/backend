@@ -5,11 +5,42 @@
     attributes:
       upper: "7.5"
       lower: "6.5"
+  - name: ec
+    unique_id: d98e05d6-4e53-4874-a65d-de8d89add97c
+    state: ""
+    attributes:
+      upper: "3.4"
+      lower: "2.5"
+  - name: temperature
+    unique_id: 2bdb8415-c147-4548-a0bf-596b8fabb94f
+    state: ""
+    attributes:
+      upper: "25"
+      lower: "20"
+  - name: room_temperature
+    unique_id: 1f0a82ce-09a0-42d7-b78f-ee13831d1b0d
+    state: ""
+    attributes:
+      upper: "29"
+      lower: "15"
+  - name: humidity
+    unique_id: db76d353-cd93-488c-b5aa-d2b09447dec8
+    state: ""
+    attributes:
+      upper: "80"
+      lower: "50"
   - name: floater
-    unique_id: e87be260-dddb-4161-a4f0-3ddb3fbc6168
+    unique_id: 501a3238-5071-41c3-9cd8-015499e13c30
     state: ""
     attributes:
       upper: "1"
       lower: "0"
+  - name: light
+    unique_id: e87be260-dddb-4161-a4f0-3ddb3fbc6168
+    state: "12:50:30"
+    attributes:
+      upper: "1"
+      lower: "0"
+      
       
 

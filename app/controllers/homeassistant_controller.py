@@ -1,7 +1,8 @@
 from fastapi.responses import JSONResponse
 from fastapi import APIRouter
 from utils.logger import logger
-from clients.homeassistant_client import get_homeassistant_config_files, modify_threshold, modify_light_cycle
+from clients.homeassistant_client import get_homeassistant_config_files
+from clients import homeassistant_client
 from models.template import Attribute
 from models.sensors import Sensors
 from datetime import datetime
@@ -22,7 +23,7 @@ async def modify_threshold(sensor_name: str, attribute: Attribute):
     try:
         match sensor_name:
             case Sensors.PH, Sensors.TEMPERATURE, Sensors.HUMIDITY, Sensors.ROOM_TEMPERATURE, Sensors.EC:
-                await modify_threshold(sensor_name, attribute)
+                await homeassistant_client.modify_threshold(sensor_name, attribute)
                 return response()
             case Sensors.FLOATER:
                 return JSONResponse(status_code=400, content={"message": "floater threshold cant be modified"})
@@ -34,7 +35,7 @@ async def modify_threshold(sensor_name: str, attribute: Attribute):
 @router.post("/modify_light_cycle")
 async def modify_light_cycle(cycle: datetime.time):
     try:
-        await modify_light_cycle(cycle)
+        await homeassistant_client.modify_light_cycle(cycle)
         return response()
     except Exception as e:
         return JSONResponse(status_code=500, content={"message": f"Failed to modify light cycle {str(e)}"})
