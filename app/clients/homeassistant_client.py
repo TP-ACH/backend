@@ -1,74 +1,34 @@
 import os
 import requests
 import json
-import yaml
 
-from datetime import datetime
-from models.sensors import Sensors
 from utils.logger import logger
-from clients.mongodb_client import insert_ha_data
-from models import automation, template, rest_command, script
+from models import automation, template, script
+from validators.automations_validator import validate
 
 HA_BASE_URL = os.getenv("HA_URL")
+
+HA_TRIGGER_BASE_URL = f"{HA_BASE_URL}/webhook/"
+
+POST_AUTOMATION = f"{HA_BASE_URL}/config/automation/config/"
 
 HEADERS = {
     "Content-Type": "application/json"
 }
 
-
-async def get_script_file():
-    logger.info("Getting script.yaml file from Home Assistant container")
-    with open('../config/scripts.yaml', 'r') as f:
-        contents = f.read()
-    data = yaml.safe_load(contents)
-    scrpts = []
-    for key, value in data.items():
-        s = script.Script(**value)
-        s.alias = key
-        scrpts.append(s)
-    # Convert to JSON and save to MongoDB
-    script_json = [s.model_dump() for s in scrpts]
-    logger.info("Saving templates to MongoDB")
+async def post_automation(automation: automation.Automation):
+    json_data = automation.model_dump()
     try:
-        await insert_ha_data("homeassistant", "scripts", script_json)
+        logger.info(f"Posting automation: {json_data} for automation: {automation.alias}")
+        response = requests.post(f"{POST_AUTOMATION}{automation.id}", json=json_data, headers=HEADERS)
+        logger.info(f"Response status code: {response.status_code} for automation: {automation.alias}")
+        if response.status_code != 200:
+            logger.error(f"Error response: {response.text}")
+            raise Exception(f"Error response: {response.text}")
     except Exception as e:
-        logger.error(f"Failed to save scripts to MongoDB: {e}")
-    for val in script_json:
-        val.pop("_id")
-    return scrpts
-
-async def get_homeassistant_config_files():
-    automations = [a.model_dump() for a in await get_automation_file()]
-    templates = [t.model_dump() for t in await get_template_file()]
-    rest_commands = [r.model_dump() for r in await get_rest_command_file()]
-    scripts = [s.model_dump() for s in await get_script_file()]
-    return [automations, templates, rest_commands, scripts]
-
-
-async def modify_threshold(sensor_name: str, attribute: template.Attribute):
-    logger.info(f"Modifying threshold for sensor {sensor_name}, upper: {attribute.upper}, lower: {attribute.lower}")
-    templates = await get_template_file()
-    for t in templates:
-        for sensor in t.sensor:
-            if sensor.name == sensor_name:
-                sensor.attributes.upper = attribute.upper
-                sensor.attributes.lower = attribute.lower
-    data = [template.model_dump() for template in templates]
-    logger.info("Saving modified templates to Home Assistant")
-    with open('../config/templates.yaml', 'w') as f:
-        yaml.dump(data, f)
-
-async def modify_light_cycle(cycle: datetime.time):
-    logger.info(f"Modifying light cycle to {cycle.strftime('%H:%M:%S')}")
-    templates = await get_template_file()
-    for t in templates:
-        for sensor in t.sensor:
-            if sensor.name == Sensors.LIGHT:
-                sensor.state = cycle.strftime("%H:%M:%S")
-    data = [template.model_dump() for template in templates]
-    logger.info("Saving modified templates to Home Assistant")
-    with open('../config/templates.yaml', 'w') as f:
-        yaml.dump(data, f)
+        logger.error(f"Failed to post automation: {str(e)}")
+        raise e
+    return automation
 
 def send_to_ha(device_id: str, sensor: str, reading: float):
     HA_TOPIC = {}
@@ -100,64 +60,3 @@ def send_to_ha(device_id: str, sensor: str, reading: float):
 
     except Exception as e:
         logger.error(f"Something went wrong when sending to HA: {str(e)}")
-
-async def get_automation_file():
-    logger.info("Getting automations from Home Assistant container")
-    with open('../config/automations.yaml', 'r') as f:
-        contents = f.read()
-    data = yaml.safe_load(contents)
-    automations = [automation.Automation(**item) for item in data]
-    
-    # Convert to JSON and save to MongoDB
-    automation_json = [automation.model_dump() for automation in automations]
-    logger.info("Saving automations to MongoDB")
-    try:
-        await insert_ha_data("homeassistant", "automations", automation_json)
-    except Exception as e:
-        logger.error(f"Failed to save automations to MongoDB: {e}")
-    for val in automation_json:
-        val.pop("_id")
-    return automations
-
-async def get_template_file():
-    logger.info("Getting templates.yaml file from Home Assistant container")
-    with open('../config/templates.yaml', 'r') as f:
-        contents = f.read()
-    data = yaml.safe_load(contents)
-    templates = [template.Template(**item) for item in data]
-    
-    # Convert to JSON and save to MongoDB
-    template_json = [template.model_dump() for template in templates]
-    logger.info("Saving templates to MongoDB")
-    try:
-        await insert_ha_data("homeassistant", "templates", template_json)
-    except Exception as e:
-        logger.error(f"Failed to save templates to MongoDB: {e}")
-    for val in template_json:
-        val.pop("_id")
-    return templates
-
-
-async def get_rest_command_file():
-    logger.info("Getting rest_commands.yaml file from Home Assistant container")
-    with open('../config/rest_commands.yaml', 'r') as f:
-        contents = f.read()
-    data = yaml.safe_load(contents)
-    rest_commands = []
-    for item in data:
-        rc = rest_command.RestCommand(**item)
-        for key in item.keys():
-            if item[key] is None:
-                rc.alias = key
-        rest_commands.append(rc)
-    
-    # Convert to JSON and save to MongoDB
-    rest_command_json = [rest_command.model_dump() for rest_command in rest_commands]
-    logger.info("Saving templates to MongoDB")
-    try:
-        await insert_ha_data("homeassistant", "rest_commands", rest_command_json)
-    except Exception as e:
-        logger.error(f"Failed to save rest_commands to MongoDB: {e}")
-    for val in rest_command_json:
-        val.pop("_id")
-    return rest_commands

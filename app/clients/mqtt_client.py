@@ -6,7 +6,7 @@ import paho.mqtt.client as mqtt
 from utils.logger import logger
 from utils.consts import TEMP_TOPIC, PH_TOPIC, EC_TOPIC, FLOATER_TOPIC
 from clients.mongodb_client import insert_data
-from clients.homeassistant_client import send_to_ha
+from backend.app.clients.homeassistant_client import send_to_ha
 
 
 logger = logger.getChild("mqtt_client")

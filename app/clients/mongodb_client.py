@@ -1,6 +1,7 @@
 import os
 import datetime
 from typing import Dict
+from backend.app.models.model_type import ModelType
 from motor import motor_asyncio
 from utils.logger import logger
 
@@ -35,9 +36,24 @@ def insert_data(db_name, collection, reading):
     data_collection.insert_one(data_entry)
 
 
-async def insert_ha_data(db_name, collection, data):
-    db = mongo_client.get_database(db_name)
-    data_collection = db.get_collection(collection)
+async def get_ha_data_by_model(automation_name: str, model: ModelType):
+    db = mongo_client.get_database(MONGODB_DB)
+    collection = db.get_collection(model)
+    return await collection.find_one({"name": automation_name}, sort=[("last_modified", -1)])
+
+async def add_ha_data_by_model(data, model: ModelType):
+    db = mongo_client.get_database(MONGODB_DB)
+    collection = db.get_collection(model)
+    data_entry = {
+        "name": data.alias,
+        "data": data.model_dump(),
+        "last_modified": datetime.datetime.now()
+    }
+    return await collection.insert_one(data_entry)
+
+async def insert_ha_data(collection, data):
+    db = mongo_client.get_database(MONGODB_DB)
+    data_collection = db.get_collection(f"local_{collection}")
     await data_collection.insert_many(data)
 
 async def fetch_data(device_id: str, query: Dict):
