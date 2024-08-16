@@ -1,19 +1,15 @@
-.env
+*.pyc
 mongodb/mongo_data/*
 mosquitto/data/*
-app/__pycache__/*
 .idea/
 
 app/error.log
 mosquitto/config/pwfile
-
-app/models/__pycache__/*
-app/utils/__pycache__/*
-app/controllers/__pycache__/*
-app/clients/__pycache__/*
 
 error.log
 
 app/clients/__pycache__/
 
 app/controllers/__pycache__/
+
+app/utils/__pycache__/
