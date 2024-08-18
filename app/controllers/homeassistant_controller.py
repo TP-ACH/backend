@@ -1,13 +1,13 @@
 from fastapi.responses import JSONResponse
 from fastapi import APIRouter
 from utils.logger import logger
-from backend.app.services import homeassistant_service
+from services import homeassistant_service
 from models.automation import Automation
 
 router = APIRouter()
 
 @router.post("/automation/{name}")
-async def create_aumation(automation: Automation, name: str):
+async def create_aumation(name: str, automation: Automation):
     try:
         automationResult, existed = await homeassistant_service.create_automation(automation, name)
         return JSONResponse(status_code= 200 if existed else 201, content=automationResult)

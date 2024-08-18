@@ -14,10 +14,10 @@ class Action(BaseModel):
             }
 
 class Automation(BaseModel):
-    id: str
-    alias: str
+    id: str = None
+    alias: str = None
     description: str
-    trigger: List[Trigger]
+    trigger: List[Trigger] = []
     condition: Optional[List[Dict]] = []
     action: List[Action]
     mode: str = "single"

@@ -1,6 +1,6 @@
-from backend.app.clients.homeassistant_client import post_automation
-from backend.app.exceptions.not_found_exception import NotFoundException
-from backend.app.models.model_type import ModelType
+from clients.homeassistant_client import post_automation
+from exceptions.not_found_exception import NotFoundException
+from models.model_type import ModelType
 from models.sensors import Sensors
 from utils.logger import logger
 from clients.mongodb_client import get_ha_data_by_model, add_ha_data_by_model
@@ -9,8 +9,8 @@ from validators.automations_validator import validate
 
 
 async def create_automation(automation: automation.Automation, name: str):
-    logger.info(f"checking if automation: {automation.alias} exists already")
     automation.alias = name
+    logger.info(f"checking if automation: {automation.alias} exists already")
     existing = True
     try:
         automation_db = await get_ha_data_by_model(name, ModelType.automations)
@@ -28,8 +28,8 @@ async def create_automation(automation: automation.Automation, name: str):
     automation = await validate(automation)
     try:
         logger.info(f"posting automation: {automation}")
-        await result = post_automation(automation)
+        result = await post_automation(automation)
     except Exception as e:
         logger.error(f"Failed to post automation: {e}")
         raise e
-    return automation, existing
+    return result, existing

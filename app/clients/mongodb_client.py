@@ -1,7 +1,8 @@
 import os
 import datetime
 from typing import Dict
-from backend.app.models.model_type import ModelType
+from exceptions.not_found_exception import NotFoundException
+from models.model_type import ModelType
 from motor import motor_asyncio
 from utils.logger import logger
 
@@ -37,13 +38,17 @@ def insert_data(db_name, collection, reading):
 
 
 async def get_ha_data_by_model(automation_name: str, model: ModelType):
+    logger.info(f"Fetching data for {automation_name} from {model.name}")
     db = mongo_client.get_database(MONGODB_DB)
-    collection = db.get_collection(model)
-    return await collection.find_one({"name": automation_name}, sort=[("last_modified", -1)])
+    collection = db.get_collection(model.name)
+    result = await collection.find_one({"name": automation_name}, sort=[("last_modified", -1)])
+    if result is None:
+        raise NotFoundException(f"{automation_name} not found")
+    return result
 
 async def add_ha_data_by_model(data, model: ModelType):
     db = mongo_client.get_database(MONGODB_DB)
-    collection = db.get_collection(model)
+    collection = db.get_collection(model.name)
     data_entry = {
         "name": data.alias,
         "data": data.model_dump(),
@@ -67,5 +72,5 @@ async def fetch_data(device_id: str, query: Dict):
         projection = {"reading": 1, "created_at": 1, "_id": 0}
         cursor = collection.find(query, projection)
         all_data[collection_name] = await cursor.to_list(length=None)
-    
+
     return all_data

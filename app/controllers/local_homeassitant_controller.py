@@ -1,7 +1,7 @@
 from fastapi.responses import JSONResponse
 from fastapi import APIRouter
 from utils.logger import logger
-from backend.app.clients import local_homeassistant_client
+from clients import local_homeassistant_client
 from models.template import Attribute
 from models.sensors import Sensors
 from datetime import datetime
@@ -32,13 +32,13 @@ async def modify_threshold(sensor_name: str, attribute: Attribute):
         return JSONResponse(status_code=500, content={"message": f"Failed to modify threshold {str(e)}"})
 
     
-@router.post("/modify_light_cycle")
-async def modify_light_cycle(cycle: datetime.time):
-    try:
-        await local_homeassistant_client.modify_light_cycle(cycle)
-        return response()
-    except Exception as e:
-        return JSONResponse(status_code=500, content={"message": f"Failed to modify light cycle {str(e)}"})
+# @router.post("/modify_light_cycle")
+# async def modify_light_cycle(cycle: datetime.time):
+#     try:
+#         await local_homeassistant_client.modify_light_cycle(cycle)
+#         return response()
+#     except Exception as e:
+#         return JSONResponse(status_code=500, content={"message": f"Failed to modify light cycle {str(e)}"})
 
 def response():
     return JSONResponse(status_code=200, content={"result": "Threshold modified successfully"})
