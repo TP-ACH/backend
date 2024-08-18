@@ -10,7 +10,7 @@ class ConditionTemplate(BaseModel):
     value_template: str
 
 class Log(BaseModel):
-    service: str
+    service: str = "logbook.log"
     data: LogData
 
 class Condition(BaseModel):
@@ -18,7 +18,7 @@ class Condition(BaseModel):
     value_template: str
 
 class RestCommand(BaseModel):
-    service: str
+    service: str = "rest_command"
     target: Dict[str, str]
 
 class Step(RootModel[Union[Log, Condition, RestCommand]]):

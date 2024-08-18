@@ -17,3 +17,21 @@ water_check:
     - service: rest_command
       target:
         entity_id: rest_command.water_on
+ph_check:
+  alias: ph_check
+  sequence:
+    - service: logbook.log
+      data:
+        name: "ph check script log:"
+        message: >-
+          {% set upper = state_attr('sensor.ph', 'upper') %}
+          {% set lower = state_attr('sensor.ph', 'lower') %}
+          The ph thresholds are {{ lower }} to {{ upper }}.
+    - condition: template
+      value_template: >
+        {% set upper = state_attr('sensor.ph', 'upper') | int %}
+        {% set lower = state_attr('sensor.ph', 'lower') | int %}
+        {{ reading | int >= upper }}
+    - service: rest_command
+      target:
+        entity_id: rest_command.ph_down
