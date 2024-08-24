@@ -31,8 +31,6 @@ async def auth_callback(request: Request):
             return JSONResponse(status_code=response.status_code, content={"message": response.text})
 
         access_token = response.json()['access_token']
-        refresh_token = response.json()['refresh_token']
-        expires_in = response.json()['expires_in']
-        # insert data into mongo client
+        logger.info("Access token retrieved successfully")
         return access_token
     
