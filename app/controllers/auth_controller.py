@@ -31,5 +31,5 @@ async def auth_callback(request: Request):
 
         access_token = response.json()['access_token']
         logger.info("Access token retrieved successfully")
-        return access_token
+        return JSONResponse(status_code=200, content={"access_token": access_token})
     
