@@ -16,7 +16,6 @@ async def login(request: Request):
 
 @router.get("/callback")
 async def auth_callback(request: Request):
-    logger.info(str(request.url))
     code = request.query_params.get("code")
     if not code:
         return JSONResponse(status_code=400, content={"message": "Authorization code not provided"})
