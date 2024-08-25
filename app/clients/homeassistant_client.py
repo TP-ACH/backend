@@ -5,10 +5,13 @@ import yaml
 
 
 from utils.logger import logger
+from urllib.parse import urlencode
 from clients.mongodb_client import insert_ha_data
 from models import automation, template, rest_command, script
 
 HA_BASE_URL = os.getenv("HA_URL")
+HA_AUTH_URL = os.getenv("HA_AUTH_URL")
+HA_TOKEN_URL = os.getenv("HA_TOKEN_URL")
 
 HEADERS = {
     "Content-Type": "application/json"
@@ -148,3 +151,30 @@ async def modify_ph_threshold(attribute: template.Attribute):
     logger.info("Saving modified templates to Home Assistant")
     with open('../config/templates.yaml', 'w') as f:
         yaml.dump(data, f)
+        
+async def get_login_request(redirect_uri: str, client_id: str):
+    query_params = urlencode({
+        "response_type": "code",
+        "client_id": client_id,
+        "redirect_uri": redirect_uri,
+        "scope": "read",
+    })
+    return f"{HA_AUTH_URL}?{query_params}"
+
+async def get_token_request(redirect_uri: str, client_id: str, code: str):
+    data = {
+        "grant_type": "authorization_code",
+        "code": code,
+        "redirect_uri": redirect_uri,
+        "client_id": client_id,
+        }
+
+    headers = {"Content-Type": "application/x-www-form-urlencoded"}
+
+    return {
+        "url": HA_TOKEN_URL,
+        "kwargs": {
+            "headers": headers,
+            "data": data,
+        },
+    }
