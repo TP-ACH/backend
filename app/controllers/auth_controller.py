@@ -24,9 +24,6 @@ async def auth_callback(request: Request):
     
     response = await get_access_token_response(redirect_uri, client_id, code)
 
-    if response.status_code != 200:
-        return JSONResponse(status_code=response.status_code, content={"message": response.text})
-
-    access_token = response.json()['access_token']
-    logger.info("Access token retrieved successfully")
-    return JSONResponse(status_code=200, content={"access_token": access_token})
+    if response is not True:
+        return JSONResponse(status_code=response["status_code"], content={"message": response["text"]})
+    return JSONResponse(status_code=200, content={"message": "Credentials validate successfully"})

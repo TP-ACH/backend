@@ -179,16 +179,14 @@ async def get_token_request(redirect_uri: str, client_id: str, code: str):
         },
     }
 
-async def def_access_token_response(redirect_uri: str, client_id: str, code: str):
+async def get_access_token_response(redirect_uri: str, client_id: str, code: str):
     req = await get_token_request(redirect_uri, client_id, code)
 
     async with httpx.AsyncClient() as client:
         response = await client.post(req["url"], **req["kwargs"])
         
         if response.status_code != 200:
-            return JSONResponse(status_code=response.status_code, content={"message": response.text})
+            return {"status_code": response.status_code, "text": response.text}
 
-        access_token = response.json()['access_token']
-        logger.info("Access token retrieved successfully")
-        return JSONResponse(status_code=200, content={"access_token": access_token})
+        return True
     
