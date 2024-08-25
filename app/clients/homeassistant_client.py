@@ -2,7 +2,7 @@ import os
 import requests
 import json
 import yaml
-
+import httpx
 
 from utils.logger import logger
 from urllib.parse import urlencode
@@ -178,3 +178,15 @@ async def get_token_request(redirect_uri: str, client_id: str, code: str):
             "data": data,
         },
     }
+
+async def get_access_token_response(redirect_uri: str, client_id: str, code: str):
+    req = await get_token_request(redirect_uri, client_id, code)
+
+    async with httpx.AsyncClient() as client:
+        response = await client.post(req["url"], **req["kwargs"])
+        
+        if response.status_code != 200:
+            return {"status_code": response.status_code, "text": response.text}
+
+        return True
+    
