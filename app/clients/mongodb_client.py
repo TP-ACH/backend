@@ -40,16 +40,50 @@ async def insert_ha_data(db_name, collection, data):
     data_collection = db.get_collection(collection)
     await data_collection.insert_many(data)
 
-async def fetch_data(device_id: str, query: Dict):
+async def fetch_data(device_id: str, sensor: str, query: Dict):
     db = mongo_client.get_database(device_id)
     collection_names = await db.list_collection_names()
     
     all_data = {}
     
     for collection_name in collection_names:
+        if sensor and sensor != collection_name:
+            continue
         collection = db.get_collection(collection_name)
-        projection = {"reading": 1, "created_at": 1, "_id": 0}
-        cursor = collection.find(query, projection)
-        all_data[collection_name] = await cursor.to_list(length=None)
+
+        pipeline = [
+            {"$match": query},
+            {
+                "$group": {
+                    "_id": None,
+                    "max": {"$max": "$reading"},
+                    "min": {"$min": "$reading"},
+                    "average": {"$avg": "$reading"},
+                    "data": {"$push": {"reading": "$reading", "created_at": "$created_at"}}
+                }
+            },
+            {
+                "$project": {
+                    "_id": 0,
+                    "max": 1,
+                    "min": 1,
+                    "average": 1,
+                    "data": 1
+                }
+            }
+        ]
+        
+        cursor = collection.aggregate(pipeline)
+        result = await cursor.to_list(length=None)
+        
+        if result:
+            all_data[collection_name] = result[0]
+        else:
+            all_data[collection_name] = {
+                "data": [],
+                "max": None,
+                "min": None,
+                "average": None
+            }
     
     return all_data
