@@ -1,0 +1,112 @@
+[
+    {
+        "species": "anis",
+        "rules_by_sensor": [
+            {
+                "sensor": "ph",
+                "rules": [
+                    {
+                        "bound": 5.5,
+                        "compare": "less",
+                        "time": 5,
+                        "enabled": 1,
+                        "action": {
+                            "type": "mqtt",
+                            "dest": "base"
+                        }
+                    },
+                    {
+                        "bound": 6.5,
+                        "compare": "greater",
+                        "time": 5,
+                        "enabled": 1,
+                        "action": {
+                            "type": "mqtt",
+                            "dest": "acid"
+                        }
+                    }
+                ]
+            },
+            {
+                "sensor": "ec",
+                "rules": [
+                    {
+                        "bound": 0.8,
+                        "compare": "less",
+                        "time": 5,
+                        "enabled": 1,
+                        "action": {
+                            "type": "mqtt",
+                            "dest": "nutrients"
+                        }
+                    },
+                    {
+                        "bound": 1.6,
+                        "compare": "greater",
+                        "time": 5,
+                        "enabled": 1,
+                        "action": {
+                            "type": "mqtt",
+                            "dest": "water"
+                        }
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "species": "lechuga",
+        "rules_by_sensor": [
+            {
+                "sensor": "ph",
+                "rules": [
+                    {
+                        "bound": 5.5,
+                        "compare": "less",
+                        "time": 5,
+                        "enabled": 1,
+                        "action": {
+                            "type": "mqtt",
+                            "dest": "base"
+                        }
+                    },
+                    {
+                        "bound": 6.5,
+                        "compare": "greater",
+                        "time": 5,
+                        "enabled": 1,
+                        "action": {
+                            "type": "mqtt",
+                            "dest": "acid"
+                        }
+                    }
+                ]
+            },
+            {
+                "sensor": "ec",
+                "rules": [
+                    {
+                        "bound": 0.8,
+                        "compare": "less",
+                        "time": 5,
+                        "enabled": 1,
+                        "action": {
+                            "type": "mqtt",
+                            "dest": "nutrients"
+                        }
+                    },
+                    {
+                        "bound": 1.2,
+                        "compare": "greater",
+                        "time": 5,
+                        "enabled": 1,
+                        "action": {
+                            "type": "mqtt",
+                            "dest": "water"
+                        }
+                    }
+                ]
+            }
+        ]
+    }
+]
