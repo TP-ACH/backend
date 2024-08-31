@@ -1,6 +1,6 @@
 from enum import Enum
 
-class VegetablesAndHerbs(Enum):
+class Species(Enum):
     ANIS = "Anís"
     CEREFOLIO = "Cerefolio"
     PEREJIL = "Perejil"
