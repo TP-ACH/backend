@@ -1,29 +1,35 @@
-from fastapi.responses import JSONResponse, RedirectResponse
-from fastapi import APIRouter, Request
-from utils.logger import logger
-from clients.homeassistant_client import get_login_request, get_token_request, get_access_token_response
-from models.template import Attribute
-import httpx
+
+from typing import Annotated
+
+from fastapi.responses import Response
+from fastapi import Depends, HTTPException, APIRouter, status
+from fastapi.security import OAuth2PasswordRequestForm
+
+from models.auth import User, Token, UserRegister
+from services.auth_service import get_password_hash
+from clients.mongodb_client import insert_user, get_user
+from services.auth_service import generate_token, get_current_user
+
 
 router = APIRouter()
 
-@router.get("/login")
-async def login(request: Request):
-    redirect_uri = request.url_for("auth_callback")
-    client_id = str(request.url).rsplit("/", 2)[0]
-    auth_req = await get_login_request(redirect_uri, client_id)
-    return RedirectResponse(auth_req)
-
-@router.get("/callback")
-async def auth_callback(request: Request):
-    code = request.query_params.get("code")
-    if not code:
-        return JSONResponse(status_code=400, content={"message": "Authorization code not provided"})
-    redirect_uri = request.url_for("auth_callback")
-    client_id = str(request.url).rsplit("/", 2)[0]
+@router.post("/register")
+async def register_user(new_user: UserRegister):
+    user = await get_user(new_user.username)
+    if user:
+        raise HTTPException(
+            status_code=status. HTTP_409_CONFLICT ,
+            detail="Username already registered",
+        )
     
-    response = await get_access_token_response(redirect_uri, client_id, code)
+    new_user.password = get_password_hash(new_user.password)
+    await insert_user(new_user)
+    
+    return Response(status_code=201)
 
-    if response is not True:
-        return JSONResponse(status_code=response["status_code"], content={"message": response["text"]})
-    return JSONResponse(status_code=200, content={"message": "Credentials validate successfully"})
+@router.post("/login")
+async def login_for_access_token(
+    form_data: Annotated[OAuth2PasswordRequestForm, Depends()],
+    ) -> Token:
+    access_token = await generate_token(form_data.username, form_data.password)
+    return Token(access_token=access_token, token_type="bearer")

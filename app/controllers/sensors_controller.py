@@ -1,14 +1,15 @@
-from fastapi import Response, APIRouter
-from fastapi.responses import JSONResponse
-import datetime
 import json
+import datetime
 from bson import json_util
-from clients.mongodb_client import fetch_data
+from fastapi import Response, APIRouter, Depends
+from fastapi.responses import JSONResponse
+
+from services.auth_service import get_current_user
+from clients.mongodb_client import fetch_data, validate_connection
+
 from utils.logger import logger
-from clients.mongodb_client import validate_connection
 
-
-router = APIRouter()
+router = APIRouter(dependencies=[Depends(get_current_user)])
 
 
 @router.on_event("startup")
