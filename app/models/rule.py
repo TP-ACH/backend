@@ -6,7 +6,7 @@ class Action(BaseModel):
     dest: str
 
 class Rule(BaseModel):
-    bound: int
+    bound: float
     compare:str
     time: int
     enabled: bool
@@ -19,3 +19,9 @@ class RuleBySensor(BaseModel):
 class DefaultRuleBySpecies(BaseModel):
     species: str
     rules_by_sensor: List[RuleBySensor]
+    light_hours: int
+    
+class RulesByDevice(BaseModel):
+    device: str
+    rules_by_sensor: List[RuleBySensor]
+    light_hours: int
