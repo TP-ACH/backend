@@ -24,31 +24,31 @@ async def shutdown_event():
 
 @router.get("/actuator/ph_up")
 def ph_up():
-    if mqtt_client.publish(PUMP_PH_UP_TOPIC, 1):
-        return Response(status_code=200, content={"result": "OK"})
+    if mqtt_client.publish_message(PUMP_PH_UP_TOPIC, 1):
+        return Response(status_code=200)
     return JSONResponse(status_code=500, content={"message": "Failed to publish message"})
 
 @router.get("/actuator/ph_down")
 def ph_down():
-    if mqtt_client.publish(PUMP_PH_DOWN_TOPIC, 1):
-        return Response(status_code=200, content={"result": "OK"})
+    if mqtt_client.publish_message(PUMP_PH_DOWN_TOPIC, 1):
+        return Response(status_code=200)
     return JSONResponse(status_code=500, content={"message": "Failed to publish message"})
 
 @router.get("/actuator/nutrient_up")
 def nutrient_up():
-    if mqtt_client.publish(PUMP_NUTRIENT_TOPIC, 1):
-        return Response(status_code=200, content={"result": "OK"})
+    if mqtt_client.publish_message(PUMP_NUTRIENT_TOPIC, 1):
+        return Response(status_code=200)
     return JSONResponse(status_code=500, content={"message": "Failed to publish message"})
 
 @router.get("/switch_light")
 def switch_light():
-    if mqtt_client.publish(SWITCH_LIGHT_TOPIC, 1):
-        return Response(status_code=200, content={"result": "OK"})
+    if mqtt_client.publish_message(SWITCH_LIGHT_TOPIC, 1):
+        return Response(status_code=200)
     return JSONResponse(status_code=500, content={"message": "Failed to publish message"})
 
 @router.post("/water_on")
 def water_on():
-    if mqtt_client.publish(PUMP_WATER_TOPIC, 1):
-        return Response(status_code=200, content={"result": "OK"})
+    if mqtt_client.publish_message(PUMP_WATER_TOPIC, 1):
+        return Response(status_code=200)
     return JSONResponse(status_code=500, content={"message": "Failed to publish message"})
 
