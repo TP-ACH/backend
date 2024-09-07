@@ -87,3 +87,20 @@ async def fetch_data(device_id: str, sensor: str, query: Dict):
             }
     
     return all_data
+
+async def insert_species_defaults(defaults):
+    db = mongo_client.get_database("fastapi")
+    defaults_collection = db.get_collection("species_defaults")
+    await defaults_collection.insert_many([rule.dict() for rule in defaults])
+
+async def insert_rules_by_device(rules):
+    db = mongo_client.get_database("fastapi")
+    defaults_collection = db.get_collection("species_defaults")
+    rules_collection = db.get_collection("rules")
+    
+async def get_default_rules(species):
+    db = mongo_client.get_database("fastapi")
+    defaults_collection = db.get_collection("species_defaults")
+    rules =  defaults_collection.find({"species": species})
+    logger.info(rules)
+    return None
