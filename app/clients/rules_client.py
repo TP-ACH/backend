@@ -37,5 +37,5 @@ async def set_default_rules(device_id: str, species: Species):
         
         
 async def set_device_rules(device_id: str, species: Species):
-    rules = get_default_rules(species.value)
+    rules = await get_default_rules(species.value)
     return rules
