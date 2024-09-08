@@ -2,7 +2,7 @@ from models.rule import Action, Rule, RuleBySensor, DefaultRuleBySpecies, RulesB
 from utils.species import Species
 import json
 from utils.logger import logger
-from clients.mongodb_client import insert_species_defaults, get_default_rules
+from clients.mongodb_client import insert_species_defaults, get_species_defaults
 
 
 async def set_default_rules(species: Species):
@@ -13,14 +13,16 @@ async def set_default_rules(species: Species):
                 
             await insert_species_defaults(species_defaults)
             
-            logger.info("Reglas predeterminadas cargadas correctamente.")
+            logger.info("Default rules successfully set.")
 
     except FileNotFoundError:
-        logger.error("El archivo 'default_rules.json' no se encontro.")
-    except json.JSONDecodeError:
-        logger.error("Error al decodficar el archivo JSON.")
+        logger.error("File 'default_rules.json' was not found.")
+    except json.JSONDecodeError as e:
+        logger.error(f"Error decoding the JSON file: {str(e)}")
         
         
-async def set_device_rules(device_id: str, species: Species):
-    rules = await get_default_rules(species.value)
-    return rules
+async def get_default_species_rules(species: Species):
+    rules = await get_species_defaults(species.value)
+    if rules:
+        return DefaultRuleBySpecies(**rules)
+    logger.error(f"No default rules found for {species.value}")

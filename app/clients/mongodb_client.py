@@ -98,12 +98,10 @@ async def insert_rules_by_device(rules):
     defaults_collection = db.get_collection("species_defaults")
     rules_collection = db.get_collection("rules")
     
-async def get_default_rules(species):
+async def get_species_defaults(species):
     db = mongo_client.get_database("fastapi")
     defaults_collection = db.get_collection("species_defaults")
     rules =  await defaults_collection.find_one({"species": species})
     if rules:
         rules.pop("_id", None)
-        return rules
-    else:
-        return {"message": f"No se encontraron relgas para la especie {species}"}
+    return rules
