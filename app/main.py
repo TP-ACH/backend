@@ -11,8 +11,6 @@ APP_URL = os.getenv("APP_URL")
 app = FastAPI()
 
 origins = [
-    "http://localhost",
-    "http://localhost:8080",
     APP_URL,
 ]
 
@@ -20,7 +18,7 @@ app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,
     allow_credentials=True,
-    allow_methods=["GET", "POST"],
+    allow_methods=["*"],
     allow_headers=["*"],
 )
 
