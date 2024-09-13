@@ -144,6 +144,6 @@ async def update_rules_by_device(rules_by_device):
                     }
                 }
             )
-        if added.matched_count == 0:
-            await devices_collection.insert_one(rules_by_device.dict())
+            if added.matched_count == 0:
+                await devices_collection.insert_one(rules_by_device.dict())
     return {"message": "Device rules updated or added successfully"}
