@@ -123,19 +123,42 @@ async def update_rules_by_device(rules_by_device):
     devices_collection = db.get_collection("devices_rules")
     
     for sensor_update in rules_by_device.rules_by_sensor:
-        updated = await devices_collection.update_one(
-            {
-                "device": rules_by_device.device,
-                "rules_by_sensor.sensor": sensor_update.sensor,
-            },
-            {
-                "$set": {
-                    "rules_by_sensor.$.rules": [rule.dict() for rule in sensor_update.rules]
-                }
-            }
+        logger.info(f"Updating rules for sensor: {sensor_update.sensor}")
+        for rule_update in sensor_update.rules:
+            logger.info(f"Updating rule with compare: {rule_update.compare}")
+            updated = await devices_collection.update_one(
+                {
+                    "device": rules_by_device.device,
+                    "rules_by_sensor.sensor": sensor_update.sensor,
+                    "rules_by_sensor.rules.compare": {"$eq": rule_update.compare}
+                },
+                {
+                    "$set": {
+                        "rules_by_sensor.$[sensor].rules.$[rule]": rule_update.dict()
+                    }
+                },
+                array_filters=[
+                    {"sensor.sensor": sensor_update.sensor},
+                    {"rule.compare": rule_update.compare}
+                ]
+            )
+            if updated.matched_count == 0:
+                logger.info(f"Rule not found for sensor {sensor_update.sensor}, compare {rule_update.compare}. Pushing new rule.")
+                await devices_collection.update_one(
+                    {"device": rules_by_device.device, "rules_by_sensor.sensor": sensor_update.sensor},
+                    {
+                        "$push": {
+                            "rules_by_sensor.$.rules": rule_update.dict()
+                        }
+                    }
+                )
+        
+        sensor_exists = await devices_collection.find_one(
+            {"device": rules_by_device.device, "rules_by_sensor.sensor": sensor_update.sensor}
         )
         
-        if updated.matched_count == 0:
+        if not sensor_exists:
+            logger.info(f"Sensor {sensor_update.sensor} not found. Adding new sensor with rules.")
             added = await devices_collection.update_one(
                 {"device": rules_by_device.device},
                 {
@@ -144,6 +167,8 @@ async def update_rules_by_device(rules_by_device):
                     }
                 }
             )
+            logger.info(f"Added sensor result: {added}")
             if added.matched_count == 0:
+                logger.info(f"Inserting new device entry for {rules_by_device.device}")
                 await devices_collection.insert_one(rules_by_device.dict())
     return {"message": "Device rules updated or added successfully"}
