@@ -28,10 +28,5 @@ async def get_default_species_rules(species: Species):
     logger.error(f"No default rules found for {species.value}")
     
 async def add_device_rules(rules: RulesByDevice):
-    update = await update_rules_by_device(rules)
-    return update
-    if rules.rules_by_sensor:
-        pass
-    if rules.light_hours:
-        pass
+    return await update_rules_by_device(rules)
     

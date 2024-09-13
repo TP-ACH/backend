@@ -17,10 +17,12 @@ async def set_default(species:Species):
 async def get_default_rules(species:Species):
     rules = await get_default_species_rules(species)
     if not rules:
-        return JSONResponse(status_code=500, content={"message": f"No default rules found for {species.value}"})
+        return JSONResponse(status_code=404, content={"message": f"No default rules found for {species.value}"})
     return rules
 
 @router.put("/device")
 async def add_device_rule(rules: RulesByDevice):
     update = await add_device_rules(rules)
-    return JSONResponse(status_code=200, content=update)
+    if update:
+        return JSONResponse(status_code=200, content={"message": "Rules updated successfully"})
+    return JSONResponse(status_code=500, content={"message": f"Error updating rules for device {rules.device}"})

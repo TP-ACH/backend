@@ -118,18 +118,12 @@ async def add_rules_by_device(rules_by_device):
     else:
         await devices_collection.insert_one(rules_by_device.dict())
         
-async def update_rules_by_device(rules_by_device):
-    db = mongo_client.get_database("fastapi")
-    devices_collection = db.get_collection("devices_rules")
-    
-    for sensor_update in rules_by_device.rules_by_sensor:
-        logger.info(f"Updating rules for sensor: {sensor_update.sensor}")
-        for rule_update in sensor_update.rules:
-            logger.info(f"Updating rule with compare: {rule_update.compare}")
-            updated = await devices_collection.update_one(
+async def update_existing_rule(collection, device, sensor, rule_update):
+    logger.info(f"Updating rule with compare: {rule_update.compare}")
+    return await collection.update_one(
                 {
-                    "device": rules_by_device.device,
-                    "rules_by_sensor.sensor": sensor_update.sensor,
+                    "device": device,
+                    "rules_by_sensor.sensor": sensor,
                     "rules_by_sensor.rules.compare": {"$eq": rule_update.compare}
                 },
                 {
@@ -138,37 +132,50 @@ async def update_rules_by_device(rules_by_device):
                     }
                 },
                 array_filters=[
-                    {"sensor.sensor": sensor_update.sensor},
+                    {"sensor.sensor": sensor},
                     {"rule.compare": rule_update.compare}
                 ]
             )
-            if updated.matched_count == 0:
-                logger.info(f"Rule not found for sensor {sensor_update.sensor}, compare {rule_update.compare}. Pushing new rule.")
-                await devices_collection.update_one(
-                    {"device": rules_by_device.device, "rules_by_sensor.sensor": sensor_update.sensor},
+    
+async def add_rule_existing_sensor(collection, device, sensor, rule):
+    return await collection.update_one(
+                    {"device": device, "rules_by_sensor.sensor": sensor},
                     {
                         "$push": {
-                            "rules_by_sensor.$.rules": rule_update.dict()
+                            "rules_by_sensor.$.rules": rule.dict()
                         }
                     }
                 )
+    
+async def add_new_sensor_with_rules(collection, device, sensor_rules):
+    return await collection.update_one(
+                {"device": device},
+                {
+                    "$push": {
+                        "rules_by_sensor": sensor_rules.dict()
+                    }
+                }
+            )
+
+async def update_rules_by_device(rules_by_device):
+    db = mongo_client.get_database("fastapi")
+    devices_collection = db.get_collection("devices_rules")
+    
+    for sensor_update in rules_by_device.rules_by_sensor:
+        logger.info(f"Updating rules for sensor: {sensor_update.sensor}")
+        for rule_update in sensor_update.rules:
+            updated = await update_existing_rule(devices_collection, rules_by_device.device, sensor_update.sensor, rule_update)
+            if updated.matched_count == 0:
+                logger.info(f"Rule not found for sensor {sensor_update.sensor}, compare {rule_update.compare}. Pushing new rule.")
+                await add_rule_existing_sensor(devices_collection, rules_by_device.device, sensor_update.sensor, rule_update)
         
         sensor_exists = await devices_collection.find_one(
             {"device": rules_by_device.device, "rules_by_sensor.sensor": sensor_update.sensor}
         )
-        
         if not sensor_exists:
             logger.info(f"Sensor {sensor_update.sensor} not found. Adding new sensor with rules.")
-            added = await devices_collection.update_one(
-                {"device": rules_by_device.device},
-                {
-                    "$push": {
-                        "rules_by_sensor": sensor_update.dict()
-                    }
-                }
-            )
-            logger.info(f"Added sensor result: {added}")
+            added = await add_new_sensor_with_rules(devices_collection, rules_by_device.device, sensor_update)
             if added.matched_count == 0:
                 logger.info(f"Inserting new device entry for {rules_by_device.device}")
                 await devices_collection.insert_one(rules_by_device.dict())
-    return {"message": "Device rules updated or added successfully"}
+    return True
