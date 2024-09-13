@@ -105,3 +105,45 @@ async def get_species_defaults(species):
     if rules:
         rules.pop("_id", None)
     return rules
+
+async def add_rules_by_device(rules_by_device):
+    db = mongo_client.get_database("fastapi")
+    devices_collection = db.get_collection("devices_rules")
+    device_rules =  await devices_collection.find_one({"device": rules_by_device.device})
+    
+    if device_rules:
+        await devices_collection.update_one(
+            {"device": rules_by_device.device}
+            )
+    else:
+        await devices_collection.insert_one(rules_by_device.dict())
+        
+async def update_rules_by_device(rules_by_device):
+    db = mongo_client.get_database("fastapi")
+    devices_collection = db.get_collection("devices_rules")
+    
+    for sensor_update in rules_by_device.rules_by_sensor:
+        updated = await devices_collection.update_one(
+            {
+                "device": rules_by_device.device,
+                "rules_by_sensor.sensor": sensor_update.sensor,
+            },
+            {
+                "$set": {
+                    "rules_by_sensor.$.rules": [rule.dict() for rule in sensor_update.rules]
+                }
+            }
+        )
+        
+        if updated.matched_count == 0:
+            added = await devices_collection.update_one(
+                {"device": rules_by_device.device},
+                {
+                    "$push": {
+                        "rules_by_sensor": sensor_update.dict()
+                    }
+                }
+            )
+        if added.matched_count == 0:
+            await devices_collection.insert_one(rules_by_device.dict())
+    return {"message": "Device rules updated or added successfully"}
