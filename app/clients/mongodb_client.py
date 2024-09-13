@@ -3,6 +3,7 @@ import datetime
 from typing import Dict
 from motor import motor_asyncio
 from utils.logger import logger
+from models.auth import UserInDB
 
 logger.getChild("database")
 # MongoDB connection
@@ -87,6 +88,19 @@ async def fetch_data(device_id: str, sensor: str, query: Dict):
             }
     
     return all_data
+
+
+async def get_user(username: str):
+    db = mongo_client.get_database("Users")
+    user_collection = db.get_collection("active")
+    user = await user_collection.find_one({"username": username})
+    return UserInDB(**user) if user else None
+    
+
+async def insert_user(user):
+    db = mongo_client.get_database("Users")
+    user_collection = db.get_collection("active")
+    await user_collection.insert_one(user.dict())
 
 async def insert_species_defaults(defaults):
     db = mongo_client.get_database("fastapi")

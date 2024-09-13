@@ -23,12 +23,12 @@ USERS=(
   ["arduino"]="arduino"
 )
 
-# Create a new password file and add the first user
-docker compose run mqtt5 mosquitto_passwd -c -b $PWFILE user1 "${USERS[user1]}"
-
-# Add additional users to the existing password file
+first_user=true
 for user in "${!USERS[@]}"; do
-  if [ "$user" != "user1" ]; then
-    docker compose run mqtt5 mosquitto_passwd -b $PWFILE "$user" "${USERS[$user]}"
+  if $first_user; then
+    docker compose run --rm mqtt5 mosquitto_passwd -c -b $PWFILE "$user" "${USERS[$user]}"
+    first_user=false
+  else
+    docker compose run --rm mqtt5 mosquitto_passwd -b $PWFILE "$user" "${USERS[$user]}"
   fi
 done
