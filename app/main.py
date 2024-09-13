@@ -26,13 +26,13 @@ app.add_middleware(
 app.include_router(mqtt_router, prefix="/mqtt")
 app.include_router(sensors_router, prefix="/sensors")
 app.include_router(ha_router, prefix="/ha")
-app.include_router(rules_router, prefix="/rules")
 
 # Auth routes
 app.include_router(auth_router, prefix="/auth", tags=["Auth"])
 
 # APP routes
 app.include_router(sensors_router, prefix="/sensors", tags=["App"])
+app.include_router(rules_router, prefix="/rules", tags=["App"])
 
 @app.get("/")
 def read_root():
