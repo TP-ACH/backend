@@ -106,11 +106,6 @@ async def insert_species_defaults(defaults):
     db = mongo_client.get_database("fastapi")
     defaults_collection = db.get_collection("species_defaults")
     await defaults_collection.insert_many([rule.dict() for rule in defaults])
-
-async def insert_rules_by_device(rules):
-    db = mongo_client.get_database("fastapi")
-    defaults_collection = db.get_collection("species_defaults")
-    rules_collection = db.get_collection("rules")
     
 async def get_species_defaults(species):
     db = mongo_client.get_database("fastapi")
@@ -193,3 +188,12 @@ async def update_rules_by_device(rules_by_device):
                 logger.info(f"Inserting new device entry for {rules_by_device.device}")
                 await devices_collection.insert_one(rules_by_device.dict())
     return True
+
+async def get_device_rules(device_id: str):
+    db = mongo_client.get_database("fastapi")
+    devices_collection = db.get_collection("devices_rules")
+    
+    rules = await devices_collection.find_one({"device": device_id})
+    if rules:
+        rules.pop("_id", None)
+    return rules

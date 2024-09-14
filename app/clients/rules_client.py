@@ -2,7 +2,7 @@ from models.rule import Action, Rule, RuleBySensor, DefaultRuleBySpecies, RulesB
 from utils.species import Species
 import json
 from utils.logger import logger
-from clients.mongodb_client import insert_species_defaults, get_species_defaults, update_rules_by_device
+from clients.mongodb_client import insert_species_defaults, get_species_defaults, update_rules_by_device, get_device_rules
 
 
 async def set_default_rules(species: Species):
@@ -30,3 +30,6 @@ async def get_default_species_rules(species: Species):
 async def add_device_rules(rules: RulesByDevice):
     return await update_rules_by_device(rules)
     
+async def read_device_rules(device_id: str):
+    rules = await get_device_rules(device_id)
+    return RulesByDevice(**rules)
