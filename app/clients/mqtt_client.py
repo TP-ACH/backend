@@ -68,7 +68,7 @@ class MQTTClient:
                 break
             except Exception as e:
                 logger.error(f"Connection failed: {e}")
-                time.sleep(5)  # Wait for 5 seconds before retrying
+                time.sleep(5)
     
     def publish_message(self, topic, message):
         res = self.client.publish(topic, message)

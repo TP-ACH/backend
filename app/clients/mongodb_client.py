@@ -55,7 +55,10 @@ async def fetch_data(device_id: str, sensor: str, query: Dict):
                     "max": {"$max": "$reading"},
                     "min": {"$min": "$reading"},
                     "average": {"$avg": "$reading"},
-                    "data": {"$push": {"reading": "$reading", "created_at": "$created_at"}}
+                    "data": {"$push": {
+                        "reading": "$reading",
+                        "created_at": {"$dateToString": {"format": "%Y-%m-%d %H:%M:%S", "date": "$created_at", "timezone": "America/Sao_Paulo"}}
+                    }}
                 }
             },
             {
