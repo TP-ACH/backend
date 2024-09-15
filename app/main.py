@@ -23,7 +23,6 @@ app.add_middleware(
 )
 
 app.include_router(mqtt_router, prefix="/mqtt")
-app.include_router(sensors_router, prefix="/sensors")
 
 # Auth routes
 app.include_router(auth_router, prefix="/auth", tags=["Auth"])
