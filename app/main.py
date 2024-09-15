@@ -5,7 +5,6 @@ from controllers.auth_controller import router as auth_router
 from controllers.mqtt_controller import router as mqtt_router
 from controllers.rules_controller import router as rules_router
 from controllers.sensors_controller import router as sensors_router
-from controllers.homeassistant_controller import router as ha_router
 
 APP_URL = os.getenv("APP_URL")
 
@@ -25,7 +24,6 @@ app.add_middleware(
 
 app.include_router(mqtt_router, prefix="/mqtt")
 app.include_router(sensors_router, prefix="/sensors")
-app.include_router(ha_router, prefix="/ha")
 
 # Auth routes
 app.include_router(auth_router, prefix="/auth", tags=["Auth"])
