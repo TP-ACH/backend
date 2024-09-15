@@ -26,11 +26,12 @@ def on_connect(client, userdata, flags, reason_code, properties=None):
         client.subscribe(EC_TOPIC)
         client.subscribe(FLOATER_TOPIC)
 
+
 def on_subscribe(client, userdata, mid, reason_code_list, properties=None):
     if reason_code_list[0].is_failure:
         logger.error(f"Failed to subscribe: {reason_code_list[0]}")
     else:
-        logger.info('Successfully subscribed to topic')
+        logger.info("Successfully subscribed to topic")
 
 
 def on_message(client, userdata, msg):
@@ -38,10 +39,12 @@ def on_message(client, userdata, msg):
         sensor = msg.topic.split("/")[1]
         data = json.loads(msg.payload.decode("utf-8"))
 
-        device_id = str(data.get('device_id', None))
-        reading = float(data.get('reading', None))
+        device_id = str(data.get("device_id", None))
+        reading = float(data.get("reading", None))
         if device_id and reading:
-            logger.info(f"Received message from topic: {sensor}, device: {device_id} and reading: {reading}")
+            logger.info(
+                f"Received message from topic: {sensor}, device: {device_id} and reading: {reading}"
+            )
             insert_data(device_id, sensor, reading)
         else:
             logger.error(f"Invalid message received: {data}")
@@ -54,7 +57,9 @@ def on_message(client, userdata, msg):
 
 class MQTTClient:
     def __init__(self):
-        self.client = mqtt.Client(mqtt.CallbackAPIVersion.VERSION2, client_id='fastapi-mqtt')
+        self.client = mqtt.Client(
+            mqtt.CallbackAPIVersion.VERSION2, client_id="fastapi-mqtt"
+        )
 
     def start_mqtt_client(self):
         while True:
@@ -69,7 +74,7 @@ class MQTTClient:
             except Exception as e:
                 logger.error(f"Connection failed: {e}")
                 time.sleep(5)
-    
+
     def publish_message(self, topic, message):
         res = self.client.publish(topic, message)
         res.wait_for_publish(15)

@@ -32,6 +32,7 @@ app.include_router(auth_router, prefix="/auth", tags=["Auth"])
 app.include_router(sensors_router, prefix="/sensors", tags=["App"])
 app.include_router(rules_router, prefix="/rules", tags=["App"])
 
+
 @app.get("/")
 def read_root():
     return {"Hello": "World"}

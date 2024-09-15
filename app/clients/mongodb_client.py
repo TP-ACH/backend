@@ -17,6 +17,7 @@ MONGODB_URI = f"mongodb://{MONGODB_USER}:{MONGODB_PASSWORD}@{MONGODB_HOST}:{MONG
 
 mongo_client = motor_asyncio.AsyncIOMotorClient(MONGODB_URI)
 
+
 async def validate_connection():
     try:
         logger.info(MONGODB_URI)
@@ -29,19 +30,16 @@ async def validate_connection():
 def insert_data(db_name, collection, reading):
     db = mongo_client.get_database(db_name)
     data_collection = db.get_collection(collection)
-    data_entry = {
-        "reading": reading,
-        "created_at": datetime.datetime.now()
-    }
+    data_entry = {"reading": reading, "created_at": datetime.datetime.now()}
     data_collection.insert_one(data_entry)
 
 
 async def fetch_data(device_id: str, sensor: str, query: Dict):
     db = mongo_client.get_database(device_id)
     collection_names = await db.list_collection_names()
-    
+
     all_data = {}
-    
+
     for collection_name in collection_names:
         if sensor and sensor != collection_name:
             continue
@@ -55,26 +53,26 @@ async def fetch_data(device_id: str, sensor: str, query: Dict):
                     "max": {"$max": "$reading"},
                     "min": {"$min": "$reading"},
                     "average": {"$avg": "$reading"},
-                    "data": {"$push": {
-                        "reading": "$reading",
-                        "created_at": {"$dateToString": {"format": "%Y-%m-%d %H:%M:%S", "date": "$created_at", "timezone": "America/Sao_Paulo"}}
-                    }}
+                    "data": {
+                        "$push": {
+                            "reading": "$reading",
+                            "created_at": {
+                                "$dateToString": {
+                                    "format": "%Y-%m-%d %H:%M:%S",
+                                    "date": "$created_at",
+                                    "timezone": "America/Sao_Paulo",
+                                }
+                            },
+                        }
+                    },
                 }
             },
-            {
-                "$project": {
-                    "_id": 0,
-                    "max": 1,
-                    "min": 1,
-                    "average": 1,
-                    "data": 1
-                }
-            }
+            {"$project": {"_id": 0, "max": 1, "min": 1, "average": 1, "data": 1}},
         ]
-        
+
         cursor = collection.aggregate(pipeline)
         result = await cursor.to_list(length=None)
-        
+
         if result:
             all_data[collection_name] = result[0]
         else:
@@ -82,9 +80,9 @@ async def fetch_data(device_id: str, sensor: str, query: Dict):
                 "data": [],
                 "max": None,
                 "min": None,
-                "average": None
+                "average": None,
             }
-    
+
     return all_data
 
 
@@ -93,7 +91,7 @@ async def get_user(username: str):
     user_collection = db.get_collection("active")
     user = await user_collection.find_one({"username": username})
     return UserInDB(**user) if user else None
-    
+
 
 async def insert_user(user):
     db = mongo_client.get_database("Users")
