@@ -6,6 +6,7 @@ import paho.mqtt.client as mqtt
 from utils.logger import logger
 from utils.consts import TEMP_TOPIC, PH_TOPIC, EC_TOPIC, FLOATER_TOPIC
 from clients.mongodb_client import insert_data
+from clients.rules_client import execute_sensor_rules
 
 
 logger = logger.getChild("mqtt_client")
@@ -46,6 +47,7 @@ def on_message(client, userdata, msg):
                 f"Received message from topic: {sensor}, device: {device_id} and reading: {reading}"
             )
             insert_data(device_id, sensor, reading)
+            execute_sensor_rules(device_id, sensor, reading)
         else:
             logger.error(f"Invalid message received: {data}")
 

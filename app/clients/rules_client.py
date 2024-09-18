@@ -1,12 +1,14 @@
 from models.rule import Action, Rule, RuleBySensor, DefaultRuleBySpecies, RulesByDevice
 from utils.species import Species
 import json
+from utils.comparison import Comparison
 from utils.logger import logger
 from clients.mongodb_client import (
     insert_species_defaults,
     get_species_defaults,
     update_rules_by_device,
     get_device_rules,
+    get_sensor_rules,
 )
 
 
@@ -42,3 +44,24 @@ async def add_device_rules(rules: RulesByDevice):
 async def read_device_rules(device_id: str):
     rules = await get_device_rules(device_id)
     return RulesByDevice(**rules)
+
+async def execute_sensor_rules(device_id: str, sensor: str, reading):
+    rules = await get_sensor_rules(device_id, sensor)
+    sensor_rules = RuleBySensor(**rules)
+    
+    for rule in sensor_rules.rules:
+        if evaluate_rule(rule, reading):
+            execute_action(rule.action, reading, rule.bound)
+    
+    return sensor_rules
+
+def evaluate_rule(rule, reading: float) -> bool:
+    return Comparison(rule.compare.upper()).compare(reading, rule.bound)
+    
+def execute_action(action: Action, reading: float, bound: float):
+    if action.type == "mqtt":
+        print(f"Sending MQTT message to {action.dest}. Reading: {reading}, Bound: {bound}")
+        #send_mqtt_message(action.dest, reading)
+    elif action.type == "alert":
+        print(f"Sending alert to {action.dest}. Reading: {reading}, Bound: {bound}")
+        #send_alert(action.dest, reading)
