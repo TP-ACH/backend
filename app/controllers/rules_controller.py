@@ -9,6 +9,7 @@ from clients.rules_client import (
     get_default_species_rules,
     add_device_rules,
     read_device_rules,
+    execute_sensor_rules,
 )
 
 
@@ -52,4 +53,9 @@ async def get_device_rules(device_id: str):
             status_code=404,
             content={"message": f"No rules found for device {device_id}"},
         )
+    return rules
+
+@router.get("/sensor")
+async def get_sensor_rules(device_id: str, sensor: str, reading: float):
+    rules = await execute_sensor_rules(device_id, sensor, reading)
     return rules

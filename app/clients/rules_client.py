@@ -10,7 +10,7 @@ from clients.mongodb_client import (
     get_device_rules,
     get_sensor_rules,
 )
-
+from utils.actions import Action
 
 async def set_default_rules(species: Species):
     try:
@@ -45,6 +45,7 @@ async def read_device_rules(device_id: str):
     rules = await get_device_rules(device_id)
     return RulesByDevice(**rules)
 
+
 async def execute_sensor_rules(device_id: str, sensor: str, reading):
     rules = await get_sensor_rules(device_id, sensor)
     sensor_rules = RuleBySensor(**rules)
@@ -55,13 +56,11 @@ async def execute_sensor_rules(device_id: str, sensor: str, reading):
     
     return sensor_rules
 
+
 def evaluate_rule(rule, reading: float) -> bool:
-    return Comparison(rule.compare.upper()).compare(reading, rule.bound)
+    return Comparison(rule.compare.lower()).compare(reading, rule.bound)
+    # aca deberia ver si fallo la cantidad de veces necesarias para triggerearlo
+    
     
 def execute_action(action: Action, reading: float, bound: float):
-    if action.type == "mqtt":
-        print(f"Sending MQTT message to {action.dest}. Reading: {reading}, Bound: {bound}")
-        #send_mqtt_message(action.dest, reading)
-    elif action.type == "alert":
-        print(f"Sending alert to {action.dest}. Reading: {reading}, Bound: {bound}")
-        #send_alert(action.dest, reading)
+    Action(action.type.lower()).execute(action, reading, bound)
