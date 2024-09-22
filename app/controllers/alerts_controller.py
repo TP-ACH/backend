@@ -8,8 +8,7 @@ from clients.alerts_client import create_new_alert, update_alert_status
 from services.auth_service import get_current_user
 
 
-# router = APIRouter(dependencies=[Depends(get_current_user)])
-router = APIRouter()
+router = APIRouter(dependencies=[Depends(get_current_user)])
 
 @router.get("/")
 async def get_alerts(device_id: str = None, type: Type = None, status: Status = None):
