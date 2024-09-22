@@ -4,6 +4,7 @@ from typing import Dict
 from motor import motor_asyncio
 from utils.logger import logger
 from models.auth import UserInDB
+from models.alert import Alert
 
 logger.getChild("database")
 # MongoDB connection
@@ -205,3 +206,25 @@ async def get_device_rules(device_id: str):
     if rules:
         rules.pop("_id", None)
     return rules
+
+async def read_alerts(type, status) -> list[Alert]:
+    db = mongo_client.get_database("fastapi")
+    alert_collection = db.get_collection("alerts"
+                                         )
+    alerts_cursor= alert_collection.find({"type": type.value, "status": status.value})
+    alerts = await alerts_cursor.to_list(length=None)
+    
+    return [Alert(**{**alert, "_id": str(alert["_id"])}) for alert in alerts]
+
+async def insert_alert(alert) -> Alert:
+    db = mongo_client.get_database("fastapi")
+    alert_collection = db.get_collection("alerts")
+    
+    alert_dict = alert.dict(by_alias=True, exclude={"id"})
+    alert_dict["type"] = alert.type.value
+    alert_dict["status"] = alert.status.value
+    
+    result = await alert_collection.insert_one(alert_dict)
+    
+    alert.id = str(result.inserted_id)
+    return alert
