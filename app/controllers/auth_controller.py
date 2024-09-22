@@ -1,13 +1,13 @@
 from typing import Annotated
 
 from fastapi.responses import Response
-from fastapi import Depends, HTTPException, APIRouter, status
 from fastapi.security import OAuth2PasswordRequestForm
+from fastapi import Depends, HTTPException, APIRouter, status
 
-from models.auth import User, Token, UserRegister
+from models.auth import Token, UserRegister
 from services.auth_service import get_password_hash
 from clients.mongodb_client import insert_user, get_user
-from services.auth_service import generate_token, get_current_user
+from services.auth_service import generate_token
 
 
 router = APIRouter()
@@ -15,15 +15,16 @@ router = APIRouter()
 
 @router.post("/register")
 async def register_user(new_user: UserRegister):
-    user = await get_user(new_user.username)
+    new_user_data = new_user.user
+    user = await get_user(new_user_data.username)
     if user:
         raise HTTPException(
             status_code=status.HTTP_409_CONFLICT,
             detail="Username already registered",
         )
-
-    new_user.password = get_password_hash(new_user.password)
-    await insert_user(new_user)
+    # TODO: Add device_id validation
+    new_user_data.password = get_password_hash(new_user_data.password)
+    await insert_user(new_user_data)
 
     return Response(status_code=201)
 

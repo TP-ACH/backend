@@ -6,6 +6,7 @@ from motor import motor_asyncio
 from utils.logger import logger
 from models.auth import UserInDB
 from models.alert import Alert, AlertUpdate
+from models.auth import User
 
 logger.getChild("database")
 # MongoDB connection
@@ -92,10 +93,10 @@ async def get_user(username: str):
     db = mongo_client.get_database("Users")
     user_collection = db.get_collection("active")
     user = await user_collection.find_one({"username": username})
-    return UserInDB(**user) if user else None
+    return User(**user) if user else None
 
 
-async def insert_user(user):
+async def insert_user(user: User):
     db = mongo_client.get_database("Users")
     user_collection = db.get_collection("active")
     await user_collection.insert_one(user.dict())
