@@ -207,11 +207,19 @@ async def get_device_rules(device_id: str):
         rules.pop("_id", None)
     return rules
 
-async def read_alerts(type, status) -> list[Alert]:
+async def read_alerts(type=None, status=None, message=None) -> list[Alert]:
     db = mongo_client.get_database("fastapi")
     alert_collection = db.get_collection("alerts"
                                          )
-    alerts_cursor= alert_collection.find({"type": type.value, "status": status.value})
+    filter = {}
+    if type:
+        filter["type"] = type.value
+    if status:
+        filter["status"] = status.value   
+    if message:
+        filter["message"] = message
+    
+    alerts_cursor= alert_collection.find(filter)
     alerts = await alerts_cursor.to_list(length=None)
     
     return [Alert(**{**alert, "_id": str(alert["_id"])}) for alert in alerts]

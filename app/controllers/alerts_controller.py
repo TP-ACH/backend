@@ -3,7 +3,8 @@ from fastapi.responses import JSONResponse
 
 from utils.alerts import Type, Status
 from models.alert import Alert
-from clients.mongodb_client import read_alerts, insert_alert
+from clients.mongodb_client import read_alerts
+from clients.alerts_client import create_new_alert
 from services.auth_service import get_current_user
 
 
@@ -16,4 +17,4 @@ async def get_alerts(type: Type = None, status: Status = None):
 
 @router.post("/")
 async def create_alert(alert: Alert):
-    return await insert_alert(alert)
+    return await create_new_alert(alert)
