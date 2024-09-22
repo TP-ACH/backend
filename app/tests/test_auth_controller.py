@@ -34,9 +34,13 @@ def test_register(client, mock_mongo_client):
     response = client.post(
         "/auth/register",
         json={
-            "username": "newuser",
-            "password": "newpassword",
-            "email": "newuser@example.com",
+            "user": {
+                "username": "newuser",
+                "password": "newpassword",
+                "first_name": "John",
+                "last_name": "Doe",
+            },
+            "device_id": "1234",
         },
     )
     assert response.status_code == 201
@@ -47,14 +51,20 @@ def test_register_conflict(client, mock_mongo_client):
     mock_mongo_client.find_one.return_value = {
         "username": "existinguser",
         "password": get_password_hash("password123"),
+        "first_name": "John",
+        "last_name": "Doe",
     }
 
     response = client.post(
         "/auth/register",
         json={
-            "username": "existinguser",
-            "password": "password123",
-            "email": "existinguser@example.com",
+            "user": {
+                "username": "existinguser",
+                "password": "password123",
+                "first_name": "John",
+                "last_name": "Doe",
+            },
+            "device_id": "1234",
         },
     )
     assert response.status_code == 409
@@ -73,10 +83,29 @@ def test_register_missing_required_fields(client, mock_mongo_client):
     assert response.status_code == 422
 
 
+def test_register_missing_device_id(client, mock_mongo_client):
+    mock_mongo_client.find_one.return_value = None
+
+    response = client.post(
+        "/auth/register",
+        json={
+            "user": {
+                "username": "newuser",
+                "password": "newpassword",
+                "first_name": "John",
+                "last_name": "Doe",
+            },
+        },
+    )
+    assert response.status_code == 422
+
+
 def test_login(client, mock_mongo_client):
     mock_mongo_client.find_one.return_value = {
         "username": "testuser",
         "password": get_password_hash("testpassword"),
+        "first_name": "John",
+        "last_name": "Doe",
     }
 
     response = client.post(
@@ -88,8 +117,10 @@ def test_login(client, mock_mongo_client):
 
 def test_login_wrong_credentials(client, mock_mongo_client):
     mock_mongo_client.find_one.return_value = {
-        "username": "testuser",
-        "password": get_password_hash("testpassword"),
+        "username": "existinguser",
+        "password": get_password_hash("password123"),
+        "first_name": "John",
+        "last_name": "Doe",
     }
 
     response = client.post(

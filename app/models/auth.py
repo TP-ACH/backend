@@ -13,12 +13,11 @@ class TokenData(BaseModel):
 
 class User(BaseModel):
     username: str
-    full_name: Optional[str] = None
-
-
-class UserInDB(User):
+    first_name: str
+    last_name: str
     password: str
 
 
-class UserRegister(User):
-    password: str
+class UserRegister(BaseModel):
+    user: User
+    device_id: str
