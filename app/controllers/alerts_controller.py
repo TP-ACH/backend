@@ -3,7 +3,7 @@ from fastapi.responses import JSONResponse
 
 from utils.alerts import Type, Status
 from models.alert import Alert
-from clients.mongodb_client import read_alerts
+from clients.mongodb_client import read_alerts, delete_alert
 from clients.alerts_client import create_new_alert, update_alert_status
 from services.auth_service import get_current_user
 
@@ -29,4 +29,16 @@ async def change_alert_status(id: str, status: Status):
         )
     return JSONResponse(
             status_code=200, content={"message": "Alert updated successfully"}
+        )
+    
+@router.delete("/")
+async def remove_alert(id: str):
+    result = await delete_alert(id)
+    if not result:
+        return JSONResponse(
+            status_code=404,
+            content={"message": f"No alert found with id {id}"},
+        )
+    return JSONResponse(
+            status_code=200, content={"message": "Alert deleted successfully"}
         )
