@@ -12,8 +12,8 @@ from services.auth_service import get_current_user
 router = APIRouter()
 
 @router.get("/")
-async def get_alerts(type: Type = None, status: Status = None):
-    return await read_alerts(type, status)
+async def get_alerts(device_id: str = None, type: Type = None, status: Status = None):
+    return await read_alerts(device_id, type, status)
 
 @router.post("/")
 async def create_alert(alert: Alert):

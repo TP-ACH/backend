@@ -5,6 +5,7 @@ from bson import ObjectId
 
 class Alert(BaseModel):
     id: Optional[str] = Field(alias="_id")
+    device_id: str
     type: Type
     status: Status
     message: str

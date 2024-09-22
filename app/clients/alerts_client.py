@@ -4,7 +4,7 @@ from utils.logger import logger
 from clients.mongodb_client import read_alerts, insert_alert
 
 async def create_new_alert(alert: Alert):
-    existing_alerts = await read_alerts(type = alert.type, message=alert.message)
+    existing_alerts = await read_alerts(device_id = alert.device_id, type = alert.type, message=alert.message)
     
     for db_alert in existing_alerts:
         if db_alert.status in [Status.OPEN, Status.PENDING]:
