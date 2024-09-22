@@ -1,10 +1,11 @@
 import os
 import datetime
 from typing import Dict
+from bson import ObjectId
 from motor import motor_asyncio
 from utils.logger import logger
 from models.auth import UserInDB
-from models.alert import Alert
+from models.alert import Alert, AlertUpdate
 
 logger.getChild("database")
 # MongoDB connection
@@ -237,3 +238,15 @@ async def insert_alert(alert) -> Alert:
     
     alert.id = str(result.inserted_id)
     return alert
+
+async def update_alert(alert:AlertUpdate):
+    db = mongo_client.get_database("fastapi")
+    alert_collection = db.get_collection("alerts")
+    
+    filter = {"_id": ObjectId(alert.id)}
+    
+    update_data = {k: v for k, v in alert.dict(exclude_unset=True).items() if k != "id" and v}
+
+    result = await alert_collection.update_one(filter, {"$set": update_data})
+    
+    return result.modified_count > 0
