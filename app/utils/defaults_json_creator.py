@@ -1,5 +1,6 @@
 import csv
 import json
+from utils.consts import PUMP_PH_DOWN_TOPIC, PUMP_PH_UP_TOPIC, PUMP_NUTRIENT_TOPIC, PUMP_WATER_TOPIC, SWITCH_LIGHT_TOPIC
 
 def create_rule(sensor, lower_bound, upper_bound, lower_action, upper_action):
     return {
@@ -82,8 +83,8 @@ def process_csv_to_json(csv_file):
             plant_rules = {
                 "species": species,
                 "rules_by_sensor": [
-                    create_rule("ph", ph_lower, ph_upper, "base", "acid"),
-                    create_rule("ec", ec_lower, ec_upper, "nutrients", "water"),
+                    create_rule("ph", ph_lower, ph_upper, PUMP_PH_UP_TOPIC, PUMP_PH_DOWN_TOPIC),
+                    create_rule("ec", ec_lower, ec_upper, PUMP_NUTRIENT_TOPIC, PUMP_WATER_TOPIC),
                 ]
                 + create_temperature_and_humidity_rules(),
                 "light_hours": light_hours,
