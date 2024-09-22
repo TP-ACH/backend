@@ -12,6 +12,8 @@ from clients.mongodb_client import (
 )
 from utils.actions import Action
 
+rule_failure_counts = {}
+
 async def set_default_rules(species: Species):
     try:
         with open("default_rules.json", "r") as file:
@@ -51,16 +53,33 @@ async def execute_sensor_rules(device_id: str, sensor: str, reading):
     sensor_rules = RuleBySensor(**rules)
     
     for rule in sensor_rules.rules:
-        if evaluate_rule(rule, reading):
+        if evaluate_rule(device_id, sensor, rule, reading):
             execute_action(rule.action, reading, rule.bound)
     
     return sensor_rules
 
 
-def evaluate_rule(rule, reading: float) -> bool:
-    return Comparison(rule.compare.lower()).compare(reading, rule.bound)
-    # aca deberia ver si fallo la cantidad de veces necesarias para triggerearlo
+def evaluate_rule(device_id: str, sensor:str, rule: Rule, reading: float) -> bool:
+    global rule_failure_counts
     
+    out_of_bounds = Comparison(rule.compare.lower()).compare(reading, rule.bound)
+    
+    rule_key = (device_id, sensor, rule.bound, rule.compare)
+        
+    if rule_key not in rule_failure_counts:
+        rule_failure_counts[rule_key] = 0
+    
+    if out_of_bounds:
+        rule_failure_counts[rule_key] += 1
+        logger.info(f"Reading out of bounds. Counter for {rule_key}: {rule_failure_counts[rule_key]}")
+        
+        if rule_failure_counts[rule_key] >= rule.time:
+            rule_failure_counts[rule_key] = 0
+            return True
+    else:
+        rule_failure_counts[rule_key] = 0
+        
+    return False    
     
 def execute_action(action: Action, reading: float, bound: float):
     Action(action.type.lower()).execute(action, reading, bound)
