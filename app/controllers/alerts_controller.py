@@ -1,8 +1,8 @@
 from fastapi import APIRouter, Depends
 from fastapi.responses import JSONResponse
 
-from utils.alerts import Type, Status
-from models.alert import Alert
+from utils.alerts import Type, Status, Topic
+from models.alert import Alert, DBAlert
 from clients.mongodb_client import read_alerts, delete_alert
 from clients.alerts_client import create_new_alert, update_alert_status
 from services.auth_service import get_current_user
@@ -11,11 +11,11 @@ from services.auth_service import get_current_user
 router = APIRouter(dependencies=[Depends(get_current_user)])
 
 @router.get("/")
-async def get_alerts(device_id: str = None, type: Type = None, status: Status = None):
+async def get_alerts(device_id: str = None, type: Type = None, status: Status = None, topic: Topic = None):
     return await read_alerts(device_id, type, status)
 
 @router.post("/")
-async def create_alert(alert: Alert):
+async def create_alert(alert: DBAlert):
     return await create_new_alert(alert)
 
 @router.put("/")

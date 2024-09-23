@@ -4,8 +4,7 @@ from typing import Dict
 from bson import ObjectId
 from motor import motor_asyncio
 from utils.logger import logger
-from models.auth import UserInDB
-from models.alert import Alert, AlertUpdate
+from models.alert import Alert, AlertUpdate, DBAlert
 from models.auth import User
 
 logger.getChild("database")
@@ -209,7 +208,7 @@ async def get_device_rules(device_id: str):
         rules.pop("_id", None)
     return rules
 
-async def read_alerts(device_id=None, type=None, status=None, message=None) -> list[Alert]:
+async def read_alerts(device_id=None, type=None, status=None, topic=None) -> list[Alert]:
     db = mongo_client.get_database("fastapi")
     alert_collection = db.get_collection("alerts"
                                          )
@@ -218,14 +217,14 @@ async def read_alerts(device_id=None, type=None, status=None, message=None) -> l
     "device_id": device_id,
     "type": type.value if type else None,
     "status": status.value if status else None,
-    "message": message
+    "topic": topic.value if topic else None,
     }
     filter = {k: v for k, v in filter.items() if v is not None}
     
     alerts_cursor= alert_collection.find(filter)
     alerts = await alerts_cursor.to_list(length=None)
     
-    return [Alert(**{**alert, "_id": str(alert["_id"])}) for alert in alerts]
+    return [Alert.from_db_alert(DBAlert(**{**alert, "_id": str(alert["_id"])})) for alert in alerts]
 
 async def insert_alert(alert) -> Alert:
     db = mongo_client.get_database("fastapi")
@@ -234,6 +233,7 @@ async def insert_alert(alert) -> Alert:
     alert_dict = alert.dict(by_alias=True, exclude={"id"})
     alert_dict["type"] = alert.type.value
     alert_dict["status"] = alert.status.value
+    alert_dict["topic"] = alert.topic.value
     
     result = await alert_collection.insert_one(alert_dict)
     
