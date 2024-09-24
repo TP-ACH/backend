@@ -3,6 +3,8 @@ import datetime
 from typing import Dict
 from bson import ObjectId
 from motor import motor_asyncio
+from pymongo import ReturnDocument
+
 from utils.logger import logger
 from models.alert import Alert, AlertUpdate, DBAlert
 from models.auth import User
@@ -99,6 +101,18 @@ async def insert_user(user: User):
     db = mongo_client.get_database("Users")
     user_collection = db.get_collection("active")
     await user_collection.insert_one(user.dict())
+
+
+async def update_user(user: User, user_update: User):
+    db = mongo_client.get_database("Users")
+    user_collection = db.get_collection("active")
+    updated_user_data = user_update.dict(exclude_unset=True)
+    updated_user = await user_collection.find_one_and_update(
+        {"username": user.username},
+        {"$set": updated_user_data},
+        return_document=ReturnDocument.AFTER,
+    )
+    return User(**updated_user) if updated_user else None
 
 
 async def insert_species_defaults(defaults):
