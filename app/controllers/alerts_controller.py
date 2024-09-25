@@ -27,7 +27,7 @@ async def change_alert_status(id: str, status: Status):
             content={"message": f"No alert found with id {id}"},
         )
     return JSONResponse(
-            status_code=204, content={"message": "Alert updated successfully"}
+            status_code=200, content={"message": "Alert updated successfully"}
         )
     
 @router.delete("/")
@@ -39,5 +39,5 @@ async def remove_alert(id: str):
             content={"message": f"No alert found with id {id}"},
         )
     return JSONResponse(
-            status_code=204, content={"message": "Alert deleted successfully"}
+            status_code=200, content={"message": "Alert deleted successfully"}
         )

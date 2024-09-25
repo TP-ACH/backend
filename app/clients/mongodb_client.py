@@ -250,7 +250,7 @@ async def update_alert(alert:AlertUpdate):
 
     result = await alert_collection.update_one(filter, {"$set": update_data})
     
-    return result.modified_count > 0
+    return result.modified_count > 0 or result.matched_count > 0
 
 async def delete_alert(id: str):
     db = mongo_client.get_database("fastapi")
