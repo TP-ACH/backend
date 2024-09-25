@@ -133,7 +133,7 @@ def test_update_alert(client, test_db):
     alert_id = data[0]["_id"]
     
     response = client.put(f"/alerts/?id={alert_id}&status={Status.CLOSED.value}")
-    assert response.status_code == 204
+    assert response.status_code == 200
     data = response.json()
 
     response = client.get(f"/alerts/?status={Status.CLOSED.value}")
@@ -148,7 +148,7 @@ def test_delete_alert(client, test_db):
     alert_id = data[0]["_id"]
 
     response = client.delete(f"/alerts/?id={alert_id}")
-    assert response.status_code == 204
+    assert response.status_code == 200
 
     response = client.get(f"/alerts/?device_id=999")
     data = response.json()

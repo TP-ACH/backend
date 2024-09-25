@@ -9,12 +9,13 @@ async def get_alerts_with_message(device_id: str = None, type: Type = None, stat
 
 
 async def create_new_alert(alert: Alert):
-    existing_alerts = await read_alerts(device_id = alert.device_id, type = alert.type, topic=alert.topic)
+    if alert.status in [Status.OPEN, Status.PENDING]:
+        existing_alerts = await read_alerts(device_id = alert.device_id, type = alert.type, status = Status.OPEN, topic=alert.topic) or \
+                          await read_alerts(device_id = alert.device_id, type = alert.type, status = Status.PENDING, topic=alert.topic)
     
-    for existing_alert in existing_alerts:
-        if existing_alert.status in [Status.OPEN, Status.PENDING]:
-            logger.info(f"Alert already exists with id {existing_alert.id}. Skipping creation.")
-            return existing_alert
+    if existing_alerts:
+        logger.info(f"Alert already exists with id {existing_alerts[0].id}. Skipping creation.")
+        return existing_alerts[0]
             
     db_alert_data = alert.dict(exclude={"message"}, by_alias=True)
     db_alert = DBAlert(**db_alert_data)
