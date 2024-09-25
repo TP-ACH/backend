@@ -1,8 +1,10 @@
 import os
 import datetime
 from typing import Dict
+from bson import ObjectId
 from motor import motor_asyncio
 from utils.logger import logger
+from models.alert import Alert, AlertUpdate, DBAlert
 from models.auth import User
 
 logger.getChild("database")
@@ -205,3 +207,54 @@ async def get_device_rules(device_id: str):
     if rules:
         rules.pop("_id", None)
     return rules
+
+async def read_alerts(device_id=None, type=None, status=None, topic=None) -> list[Alert]:
+    db = mongo_client.get_database("fastapi")
+    alert_collection = db.get_collection("alerts"
+                                         )
+    
+    filter = {
+    "device_id": device_id,
+    "type": type.value if type else None,
+    "status": status.value if status else None,
+    "topic": topic.value if topic else None,
+    }
+    filter = {k: v for k, v in filter.items() if v is not None}
+    
+    alerts_cursor= alert_collection.find(filter)
+    alerts = await alerts_cursor.to_list(length=None)
+    
+    return [DBAlert(**{**alert, "_id": str(alert["_id"])}) for alert in alerts]
+
+async def insert_alert(alert) -> Alert:
+    db = mongo_client.get_database("fastapi")
+    alert_collection = db.get_collection("alerts")
+    
+    alert_dict = alert.dict(by_alias=True, exclude={"id"})
+    alert_dict["type"] = alert.type.value
+    alert_dict["status"] = alert.status.value
+    alert_dict["topic"] = alert.topic.value
+    
+    result = await alert_collection.insert_one(alert_dict)
+    
+    alert.id = str(result.inserted_id)
+    return alert
+
+async def update_alert(alert:AlertUpdate):
+    db = mongo_client.get_database("fastapi")
+    alert_collection = db.get_collection("alerts")
+    
+    filter = {"_id": ObjectId(alert.id)}
+    
+    update_data = {k: v for k, v in alert.dict(exclude_unset=True).items() if k != "id" and v}
+
+    result = await alert_collection.update_one(filter, {"$set": update_data})
+    
+    return result.modified_count > 0 or result.matched_count > 0
+
+async def delete_alert(id: str):
+    db = mongo_client.get_database("fastapi")
+    alert_collection = db.get_collection("alerts")
+    
+    result = await alert_collection.delete_one({"_id": ObjectId(id)})
+    return result.deleted_count > 0 
