@@ -3,8 +3,8 @@ from fastapi.responses import JSONResponse
 
 from utils.alerts import Type, Status, Topic
 from models.alert import Alert, DBAlert
-from clients.mongodb_client import read_alerts, delete_alert
-from clients.alerts_client import create_new_alert, update_alert_status
+from clients.mongodb_client import delete_alert
+from clients.alerts_client import create_new_alert, update_alert_status, get_alerts_with_message
 from services.auth_service import get_current_user
 
 
@@ -12,7 +12,7 @@ router = APIRouter(dependencies=[Depends(get_current_user)])
 
 @router.get("/")
 async def get_alerts(device_id: str = None, type: Type = None, status: Status = None, topic: Topic = None):
-    return await read_alerts(device_id, type, status)
+    return await get_alerts_with_message(device_id, type, status, topic)
 
 @router.post("/")
 async def create_alert(alert: DBAlert):
@@ -27,7 +27,7 @@ async def change_alert_status(id: str, status: Status):
             content={"message": f"No alert found with id {id}"},
         )
     return JSONResponse(
-            status_code=200, content={"message": "Alert updated successfully"}
+            status_code=204, content={"message": "Alert updated successfully"}
         )
     
 @router.delete("/")
@@ -39,5 +39,5 @@ async def remove_alert(id: str):
             content={"message": f"No alert found with id {id}"},
         )
     return JSONResponse(
-            status_code=200, content={"message": "Alert deleted successfully"}
+            status_code=204, content={"message": "Alert deleted successfully"}
         )

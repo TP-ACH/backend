@@ -224,7 +224,7 @@ async def read_alerts(device_id=None, type=None, status=None, topic=None) -> lis
     alerts_cursor= alert_collection.find(filter)
     alerts = await alerts_cursor.to_list(length=None)
     
-    return [Alert.from_db_alert(DBAlert(**{**alert, "_id": str(alert["_id"])})) for alert in alerts]
+    return [DBAlert(**{**alert, "_id": str(alert["_id"])}) for alert in alerts]
 
 async def insert_alert(alert) -> Alert:
     db = mongo_client.get_database("fastapi")
