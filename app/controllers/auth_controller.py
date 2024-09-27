@@ -5,9 +5,9 @@ from fastapi.security import OAuth2PasswordRequestForm
 from fastapi import Depends, HTTPException, APIRouter, status
 
 from models.auth import Token, UserRegister
+from services.auth_service import generate_token
 from services.auth_service import get_password_hash
 from clients.mongodb_client import insert_user, get_user
-from services.auth_service import generate_token
 
 
 router = APIRouter()
