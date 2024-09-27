@@ -1,13 +1,13 @@
-from models.rule import Action, Rule, RuleBySensor, DefaultRuleBySpecies, RulesByDevice
-from utils.species import Species
 import json
+
+from clients.mongodb_client import get_device_rules
+from clients.mongodb_client import get_species_defaults
+from clients.mongodb_client import insert_species_defaults
+from clients.mongodb_client import update_rules_by_device
+from models.rule import DefaultRuleBySpecies
+from models.rule import RulesByDevice
 from utils.logger import logger
-from clients.mongodb_client import (
-    insert_species_defaults,
-    get_species_defaults,
-    update_rules_by_device,
-    get_device_rules,
-)
+from utils.species import Species
 
 
 async def set_default_rules(species: Species):

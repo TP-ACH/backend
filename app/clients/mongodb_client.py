@@ -91,21 +91,21 @@ async def fetch_data(device_id: str, sensor: str, query: Dict):
 
 
 async def get_user(username: str):
-    db = mongo_client.get_database("Users")
-    user_collection = db.get_collection("active")
+    db = mongo_client.get_database(MONGODB_DB)
+    user_collection = db.get_collection("users")
     user = await user_collection.find_one({"username": username})
     return User(**user) if user else None
 
 
 async def insert_user(user: User):
-    db = mongo_client.get_database("Users")
-    user_collection = db.get_collection("active")
+    db = mongo_client.get_database(MONGODB_DB)
+    user_collection = db.get_collection("users")
     await user_collection.insert_one(user.dict())
 
 
 async def update_user(user: User, user_update: User):
-    db = mongo_client.get_database("Users")
-    user_collection = db.get_collection("active")
+    db = mongo_client.get_database(MONGODB_DB)
+    user_collection = db.get_collection("users")
     updated_user_data = user_update.dict(exclude_unset=True)
     updated_user = await user_collection.find_one_and_update(
         {"username": user.username},
@@ -116,13 +116,13 @@ async def update_user(user: User, user_update: User):
 
 
 async def insert_species_defaults(defaults):
-    db = mongo_client.get_database("fastapi")
+    db = mongo_client.get_database(MONGODB_DB)
     defaults_collection = db.get_collection("species_defaults")
     await defaults_collection.insert_many([rule.dict() for rule in defaults])
 
 
 async def get_species_defaults(species):
-    db = mongo_client.get_database("fastapi")
+    db = mongo_client.get_database(MONGODB_DB)
     defaults_collection = db.get_collection("species_defaults")
     rules = await defaults_collection.find_one({"species": species})
     if rules:
@@ -131,7 +131,7 @@ async def get_species_defaults(species):
 
 
 async def add_rules_by_device(rules_by_device):
-    db = mongo_client.get_database("fastapi")
+    db = mongo_client.get_database(MONGODB_DB)
     devices_collection = db.get_collection("devices_rules")
     device_rules = await devices_collection.find_one({"device": rules_by_device.device})
 
@@ -171,7 +171,7 @@ async def add_new_sensor_with_rules(collection, device, sensor_rules):
 
 
 async def update_rules_by_device(rules_by_device):
-    db = mongo_client.get_database("fastapi")
+    db = mongo_client.get_database(MONGODB_DB)
     devices_collection = db.get_collection("devices_rules")
 
     for sensor_update in rules_by_device.rules_by_sensor:
@@ -214,7 +214,7 @@ async def update_rules_by_device(rules_by_device):
 
 
 async def get_device_rules(device_id: str):
-    db = mongo_client.get_database("fastapi")
+    db = mongo_client.get_database(MONGODB_DB)
     devices_collection = db.get_collection("devices_rules")
 
     rules = await devices_collection.find_one({"device": device_id})
@@ -222,53 +222,60 @@ async def get_device_rules(device_id: str):
         rules.pop("_id", None)
     return rules
 
-async def read_alerts(device_id=None, type=None, status=None, topic=None) -> list[Alert]:
-    db = mongo_client.get_database("fastapi")
-    alert_collection = db.get_collection("alerts"
-                                         )
-    
+
+async def read_alerts(
+    device_id=None, type=None, status=None, topic=None
+) -> list[Alert]:
+    db = mongo_client.get_database(MONGODB_DB)
+    alert_collection = db.get_collection("alerts")
+
     filter = {
-    "device_id": device_id,
-    "type": type.value if type else None,
-    "status": status.value if status else None,
-    "topic": topic.value if topic else None,
+        "device_id": device_id,
+        "type": type.value if type else None,
+        "status": status.value if status else None,
+        "topic": topic.value if topic else None,
     }
     filter = {k: v for k, v in filter.items() if v is not None}
-    
-    alerts_cursor= alert_collection.find(filter)
+
+    alerts_cursor = alert_collection.find(filter)
     alerts = await alerts_cursor.to_list(length=None)
-    
+
     return [DBAlert(**{**alert, "_id": str(alert["_id"])}) for alert in alerts]
 
+
 async def insert_alert(alert) -> Alert:
-    db = mongo_client.get_database("fastapi")
+    db = mongo_client.get_database(MONGODB_DB)
     alert_collection = db.get_collection("alerts")
-    
+
     alert_dict = alert.dict(by_alias=True, exclude={"id"})
     alert_dict["type"] = alert.type.value
     alert_dict["status"] = alert.status.value
     alert_dict["topic"] = alert.topic.value
-    
+
     result = await alert_collection.insert_one(alert_dict)
-    
+
     alert.id = str(result.inserted_id)
     return alert
 
-async def update_alert(alert:AlertUpdate):
-    db = mongo_client.get_database("fastapi")
+
+async def update_alert(alert: AlertUpdate):
+    db = mongo_client.get_database(MONGODB_DB)
     alert_collection = db.get_collection("alerts")
-    
+
     filter = {"_id": ObjectId(alert.id)}
-    
-    update_data = {k: v for k, v in alert.dict(exclude_unset=True).items() if k != "id" and v}
+
+    update_data = {
+        k: v for k, v in alert.dict(exclude_unset=True).items() if k != "id" and v
+    }
 
     result = await alert_collection.update_one(filter, {"$set": update_data})
-    
+
     return result.modified_count > 0 or result.matched_count > 0
 
+
 async def delete_alert(id: str):
-    db = mongo_client.get_database("fastapi")
+    db = mongo_client.get_database(MONGODB_DB)
     alert_collection = db.get_collection("alerts")
-    
+
     result = await alert_collection.delete_one({"_id": ObjectId(id)})
-    return result.deleted_count > 0 
+    return result.deleted_count > 0

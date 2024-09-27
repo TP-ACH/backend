@@ -14,6 +14,7 @@ from clients.rules_client import (
 
 router = APIRouter(dependencies=[Depends(get_current_user)])
 
+
 @router.post("/default")
 async def set_default(species: Species):
     return await set_default_rules(species)
