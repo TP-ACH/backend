@@ -1,9 +1,10 @@
 from pydantic import BaseModel, Field
 from typing import Optional
 from utils.alerts import Type, Status, Topic, TOPIC_MESSAGES, TOPIC_TYPE_MAP
+from bson import ObjectId
 
 class DBAlert(BaseModel):
-    id: Optional[str] = Field(alias="_id")
+    id: Optional[str] = Field(default_factory=lambda: str(ObjectId()), alias="_id")
     device_id: str
     type: Type
     status: Status
@@ -15,6 +16,7 @@ class DBAlert(BaseModel):
     @classmethod
     def from_topic(cls, device_id: str, topic: Topic) -> "DBAlert":
         return cls(device_id=device_id, type=TOPIC_TYPE_MAP[topic], status=Status.OPEN, topic=topic)
+    
 class Alert(DBAlert):
     message: str
         
