@@ -7,6 +7,8 @@ from clients.mongodb_client import get_species_defaults
 from clients.mongodb_client import insert_species_defaults
 from clients.mongodb_client import update_rules_by_device
 from models.rule import DefaultRuleBySpecies
+from models.rule import Rule
+from models.rule import RuleBySensor
 from models.rule import RulesByDevice
 from utils.actions import Action
 from utils.comparison import Comparison
