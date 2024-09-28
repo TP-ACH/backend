@@ -102,6 +102,19 @@ async def insert_user(user: User):
     user_collection = db.get_collection("active")
     await user_collection.insert_one(user.dict())
 
+
+async def update_user(user: User, user_update: User):
+    db = mongo_client.get_database("Users")
+    user_collection = db.get_collection("active")
+    updated_user_data = user_update.dict(exclude_unset=True)
+    updated_user = await user_collection.find_one_and_update(
+        {"username": user.username},
+        {"$set": updated_user_data},
+        return_document=ReturnDocument.AFTER,
+    )
+    return User(**updated_user) if updated_user else None
+
+
 async def insert_species_defaults(defaults):
     db = mongo_client.get_database("fastapi")
     defaults_collection = db.get_collection("species_defaults")
@@ -274,3 +287,4 @@ async def delete_alert(id: str):
     
     result = await alert_collection.delete_one({"_id": ObjectId(id)})
     return result.deleted_count > 0 
+
