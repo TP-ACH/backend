@@ -8,7 +8,6 @@ from fastapi.security import OAuth2PasswordBearer
 from jose import JWTError, jwt
 from passlib.context import CryptContext
 
-from utils.logger import logger
 from models.auth import TokenData
 from clients.mongodb_client import get_user
 
