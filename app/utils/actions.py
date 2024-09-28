@@ -2,6 +2,7 @@ from enum import Enum
 from controllers.mqtt_controller import mqtt_client
 from controllers.alerts_controller import create_new_alert
 from models.alert import DBAlert
+from utils.alerts import Topic
 
 class Action(Enum):
     MQTT = "mqtt"
@@ -20,4 +21,4 @@ class Action(Enum):
 
     def _execute_alert(self, device_id, action, reading: float, bound: float):
         print(f"Sending alert to {action.dest}. Reading: {reading}, Bound: {bound}")
-        # send_alert(action['dest'], reading)
+        create_new_alert(DBAlert.from_topic(device_id, Topic(action.dest.lower)))

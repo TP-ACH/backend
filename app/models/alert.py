@@ -1,6 +1,6 @@
 from pydantic import BaseModel, Field
 from typing import Optional
-from utils.alerts import Type, Status, Topic, TOPIC_MESSAGES
+from utils.alerts import Type, Status, Topic, TOPIC_MESSAGES, TOPIC_TYPE_MAP
 
 class DBAlert(BaseModel):
     id: Optional[str] = Field(alias="_id")
@@ -11,6 +11,10 @@ class DBAlert(BaseModel):
     
     class Config:
         allow_population_by_field_name: True
+
+    @classmethod
+    def from_topic(cls, device_id: str, topic: Topic) -> "DBAlert":
+        return cls(device_id=device_id, type=TOPIC_TYPE_MAP[topic], status=Status.OPEN, topic=topic)
 class Alert(DBAlert):
     message: str
         
