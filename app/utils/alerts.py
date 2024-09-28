@@ -53,3 +53,23 @@ TOPIC_MESSAGES = {
     Topic.PH_OK: "Se estabilizó el pH",
     Topic.EC_OK: "Se estabilizó la EC",
 }
+
+TOPIC_TYPE_MAP = {
+    Topic.CONNECTION_LOST: Type.ERROR,
+    Topic.PH_FAIL: Type.ERROR,
+    Topic.EC_FAIL: Type.ERROR,
+    Topic.HUMIDITY_FAIL: Type.ERROR,
+    Topic.TEMPERATURE_FAIL: Type.ERROR,
+    Topic.PH_UP: Type.WARNING,
+    Topic.PH_DOWN: Type.WARNING,
+    Topic.EC_UP: Type.WARNING,
+    Topic.EC_DOWN: Type.WARNING,
+    Topic.HUMIDITY_UP: Type.WARNING,
+    Topic.HUMIDITY_DOWN: Type.WARNING,
+    Topic.TEMPERATURE_UP: Type.WARNING,
+    Topic.TEMPERATURE_DOWN: Type.WARNING,
+    Topic.LIGHTS_OFF: Type.OK,
+    Topic.LIGHTS_ON: Type.OK,
+    Topic.PH_OK: Type.OK,
+    Topic.EC_OK: Type.OK,
+}

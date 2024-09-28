@@ -223,6 +223,17 @@ async def get_device_rules(device_id: str):
     return rules
 
 
+async def get_sensor_rules(device_id: str, sensor: str):
+    db = mongo_client.get_database(MONGODB_DB)
+    devices_collection = db.get_collection("devices_rules")
+
+    device_rules = await devices_collection.find_one({"device": device_id, "rules_by_sensor.sensor": sensor})
+    if not device_rules:
+        return None
+    sensor_rules = next((s for s in device_rules["rules_by_sensor"] if s["sensor"] == sensor), None)
+    return sensor_rules
+
+    
 async def read_alerts(
     device_id=None, type=None, status=None, topic=None
 ) -> list[Alert]:

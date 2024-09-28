@@ -1,6 +1,5 @@
 from enum import Enum
 
-
 class Species(Enum):
     ANIS = "Anís"
     CEREFOLIO = "Cerefolio"

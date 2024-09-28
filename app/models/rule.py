@@ -1,7 +1,6 @@
 from pydantic import BaseModel
 from typing import List, Optional
 
-
 class Action(BaseModel):
     type: str
     dest: str
