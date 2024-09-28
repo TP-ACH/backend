@@ -224,7 +224,7 @@ async def get_device_rules(device_id: str):
 
 
 async def get_sensor_rules(device_id: str, sensor: str):
-    db = mongo_client.get_database("fastapi")
+    db = mongo_client.get_database(MONGODB_DB)
     devices_collection = db.get_collection("devices_rules")
 
     device_rules = await devices_collection.find_one({"device": device_id, "rules_by_sensor.sensor": sensor})
