@@ -16,8 +16,8 @@ class Action(Enum):
     
     def _execute_mqtt(self, device_id, action, reading: float, bound: float):
         print(f"Sending MQTT message to {action.dest}. Reading: {reading}, Bound: {bound}")
-        message = f"{device_id};{reading}"
-        mqtt_client.publish_message(action.dest, message)
+        topic = f"{device_id}/{action.dest}"
+        mqtt_client.publish_message(topic, reading)
 
     async def _execute_alert(self, device_id, action, reading: float, bound: float):
         print(f"Sending alert to {action.dest}. Reading: {reading}, Bound: {bound}")
