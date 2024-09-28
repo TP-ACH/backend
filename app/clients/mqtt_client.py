@@ -36,10 +36,11 @@ def on_subscribe(client, userdata, mid, reason_code_list, properties=None):
 
 def on_message(client, userdata, msg):
     try:
-        sensor = msg.topic.split("/")[1]
+        device_id = msg.topic.split("/")[0]
+        sensor = msg.topic.split("/")[2]
+        
         data = json.loads(msg.payload.decode("utf-8"))
 
-        device_id = str(data.get("device_id", None))
         reading = float(data.get("reading", None))
         if device_id and reading:
             logger.info(
