@@ -8,4 +8,7 @@ PUMP_PH_UP_TOPIC = "actuators/pumps/ph_up"
 PUMP_WATER_TOPIC = "actuators/pumps/water"
 ROOM_TEMP_TOPIC = "sensors/room_temperature"
 TEMP_TOPIC = "sensors/temperature"
-SWITCH_LIGHT_TOPIC = "actuators/light"
+SWITCH_LIGHT_OFF_TOPIC = "actuators/light_off"
+SWITCH_LIGHT_ON_TOPIC = "actuators/light_on"
+
+TIMEZONE = "America/Buenos_Aires"
