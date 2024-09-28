@@ -54,7 +54,7 @@ async def execute_sensor_rules(device_id: str, sensor: str, reading):
     
     for rule in sensor_rules.rules:
         if evaluate_rule(device_id, sensor, rule, reading):
-            execute_action(device_id, rule.action, reading, rule.bound)
+            await execute_action(device_id, rule.action, reading, rule.bound)
     
     return sensor_rules
 
@@ -81,5 +81,5 @@ def evaluate_rule(device_id: str, sensor:str, rule: Rule, reading: float) -> boo
         
     return False    
     
-def execute_action(device_id, action: Action, reading: float, bound: float):
-    Action(action.type.lower()).execute(device_id, action, reading, bound)
+async def execute_action(device_id, action: Action, reading: float, bound: float):
+    await Action(action.type.lower()).execute(device_id, action, reading, bound)
