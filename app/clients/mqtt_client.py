@@ -38,7 +38,6 @@ def on_message(client, userdata, msg):
     try:
         device_id = msg.topic.split("/")[0]
         sensor = msg.topic.split("/")[2]
-        
         data = json.loads(msg.payload.decode("utf-8"))
 
         reading = float(data.get("reading", None))

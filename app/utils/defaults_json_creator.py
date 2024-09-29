@@ -95,7 +95,7 @@ def process_csv_to_json(csv_file):
     return json.dumps(plants_data, indent=4)
 
 
-csv_file = "app/plants_defaults.csv"
+csv_file = "app/data/plants_defaults.csv"
 json_data = process_csv_to_json(csv_file)
 
 with open("plants_data.json", "w") as json_file:
