@@ -19,7 +19,8 @@ fi
 # List of users and passwords
 declare -A USERS
 USERS=(
-  ["test"]="test"
+  ["fastapi"]="fastapi"
+  ["celery"]="celery"
   ["arduino"]="arduino"
 )
 

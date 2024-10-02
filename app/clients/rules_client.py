@@ -20,7 +20,7 @@ rule_failure_counts = {}
 
 async def set_default_rules(species: Species):
     try:
-        with open("default_rules.json", "r") as file:
+        with open("data/default_rules.json", "r") as file:
             data = json.load(file)
             species_defaults = [
                 DefaultRuleBySpecies(**species_rules) for species_rules in data
