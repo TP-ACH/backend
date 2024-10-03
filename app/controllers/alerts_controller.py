@@ -19,12 +19,12 @@ router = APIRouter(dependencies=[Depends(get_current_user)])
 async def get_alerts(
     device_id: str = None, type: Type = None, status: Status = None, topic: Topic = None
 ):
-    return get_alerts_with_message(device_id, type, status, topic)
+    return await get_alerts_with_message(device_id, type, status, topic)
 
 
 @router.post("/")
 async def create_alert(alert: DBAlert):
-    return create_new_alert(alert)
+    return await create_new_alert(alert)
 
 
 @router.put("/")

@@ -1,10 +1,10 @@
 import json
 
 
-from clients.mongodb_client import get_sensor_rules
 from clients.mongodb_client import get_device_rules
 from clients.mongodb_client import get_species_defaults
 from clients.mongodb_client import insert_species_defaults
+from clients.mongodb_client import sync_get_sensor_rules
 from clients.mongodb_client import update_rules_by_device
 from models.rule import DefaultRuleBySpecies
 from models.rule import Rule
@@ -53,7 +53,7 @@ async def read_device_rules(device_id: str):
 
 
 def execute_sensor_rules(device_id: str, sensor: str, reading):
-    rules = get_sensor_rules(device_id, sensor)
+    rules = sync_get_sensor_rules(device_id, sensor)
     sensor_rules = RuleBySensor(**rules)
     
     for rule in sensor_rules.rules:

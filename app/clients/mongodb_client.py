@@ -224,8 +224,17 @@ async def get_device_rules(device_id: str):
         rules.pop("_id", None)
     return rules
 
+async def get_sensor_rules(device_id: str, sensor: str):
+    db = mongo_client.get_database(MONGODB_DB)
+    devices_collection = db.get_collection("devices_rules")
 
-def get_sensor_rules(device_id: str, sensor: str):
+    device_rules = await devices_collection.find_one({"device": device_id, "rules_by_sensor.sensor": sensor})
+    if not device_rules:
+        return None
+    sensor_rules = next((s for s in device_rules["rules_by_sensor"] if s["sensor"] == sensor), None)
+    return sensor_rules
+
+def sync_get_sensor_rules(device_id: str, sensor: str):
     db = sync_mongo_client.get_database(MONGODB_DB)
     devices_collection = db.get_collection("devices_rules")
 
@@ -235,8 +244,26 @@ def get_sensor_rules(device_id: str, sensor: str):
     sensor_rules = next((s for s in device_rules["rules_by_sensor"] if s["sensor"] == sensor), None)
     return sensor_rules
 
+async def read_alerts(
+    device_id=None, type=None, status=None, topic=None
+) -> list[Alert]:
+    db = mongo_client.get_database(MONGODB_DB)
+    alert_collection = db.get_collection("alerts")
+
+    filter = {
+        "device_id": device_id,
+        "type": type.value if type else None,
+        "status": status.value if status else None,
+        "topic": topic.value if topic else None,
+    }
+    filter = {k: v for k, v in filter.items() if v is not None}
+
+    alerts_cursor = alert_collection.find(filter)
+    alerts = await alerts_cursor.to_list(length=None)
+
+    return [DBAlert(**{**alert, "_id": str(alert["_id"])}) for alert in alerts]
     
-def read_alerts(
+def sync_read_alerts(
     device_id=None, type=None, status=None, topic=None
 ) -> list[Alert]:
     db = sync_mongo_client.get_database(MONGODB_DB)
@@ -254,8 +281,21 @@ def read_alerts(
 
     return [DBAlert(**{**alert, "_id": str(alert["_id"])}) for alert in list(alerts_cursor)]
 
+async def insert_alert(alert) -> Alert:
+    db = mongo_client.get_database(MONGODB_DB)
+    alert_collection = db.get_collection("alerts")
 
-def insert_alert(alert) -> Alert:
+    alert_dict = alert.dict(by_alias=True, exclude={"id"})
+    alert_dict["type"] = alert.type.value
+    alert_dict["status"] = alert.status.value
+    alert_dict["topic"] = alert.topic.value
+
+    result = await alert_collection.insert_one(alert_dict)
+
+    alert.id = str(result.inserted_id)
+    return alert
+
+def sync_insert_alert(alert) -> Alert:
     db = sync_mongo_client.get_database(MONGODB_DB)
     alert_collection = db.get_collection("alerts")
 
