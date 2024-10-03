@@ -9,6 +9,7 @@ from services.auth_service import get_current_user
 from clients.mongodb_client import fetch_data, validate_connection
 
 from utils.logger import logger
+from utils.consts import TIMEZONE
 
 router = APIRouter(dependencies=[Depends(get_current_user)])
 
@@ -25,21 +26,16 @@ async def startup_event():
 async def get_device_data(
     device_id: str,
     sensor: str | None = None,
-    start_date: datetime.date | None = None,
-    end_date: datetime.date | None = None,
+    start_date: datetime.datetime | None = None,
+    end_date: datetime.datetime | None = None,
 ):
     query = {}
+    tz = pytz.timezone(TIMEZONE)
     if start_date:
-        start_date = datetime.datetime.combine(start_date, datetime.datetime.min.time())
-        start_date = start_date.replace(
-            tzinfo=pytz.timezone("America/Sao_Paulo")
-        ).astimezone(pytz.utc)
+        start_date = tz.localize(start_date).astimezone(pytz.utc)
         query["created_at"] = {"$gte": start_date}
     if end_date:
-        end_date = datetime.datetime.combine(end_date, datetime.datetime.max.time())
-        end_date = end_date.replace(
-            tzinfo=pytz.timezone("America/Sao_Paulo")
-        ).astimezone(pytz.utc)
+        end_date = tz.localize(end_date).astimezone(pytz.utc)
         if "created_at" in query:
             query["created_at"].update({"$lte": end_date})
         else:
