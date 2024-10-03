@@ -3,6 +3,7 @@ import datetime
 from typing import Dict
 from bson import ObjectId
 from motor import motor_asyncio
+from pymongo import MongoClient
 from pymongo import ReturnDocument
 
 from utils.logger import logger
@@ -20,6 +21,7 @@ MONGODB_PASSWORD = os.getenv("MONGO_INITDB_PASSWORD")
 MONGODB_URI = f"mongodb://{MONGODB_USER}:{MONGODB_PASSWORD}@{MONGODB_HOST}:{MONGODB_PORT}/?authSource=admin&retryWrites=true&w=majority"
 
 mongo_client = motor_asyncio.AsyncIOMotorClient(MONGODB_URI)
+sync_mongo_client = MongoClient(MONGODB_URI)
 
 
 async def validate_connection():
@@ -223,21 +225,21 @@ async def get_device_rules(device_id: str):
     return rules
 
 
-async def get_sensor_rules(device_id: str, sensor: str):
-    db = mongo_client.get_database(MONGODB_DB)
+def get_sensor_rules(device_id: str, sensor: str):
+    db = sync_mongo_client.get_database(MONGODB_DB)
     devices_collection = db.get_collection("devices_rules")
 
-    device_rules = await devices_collection.find_one({"device": device_id, "rules_by_sensor.sensor": sensor})
+    device_rules = devices_collection.find_one({"device": device_id, "rules_by_sensor.sensor": sensor})
     if not device_rules:
         return None
     sensor_rules = next((s for s in device_rules["rules_by_sensor"] if s["sensor"] == sensor), None)
     return sensor_rules
 
     
-async def read_alerts(
+def read_alerts(
     device_id=None, type=None, status=None, topic=None
 ) -> list[Alert]:
-    db = mongo_client.get_database(MONGODB_DB)
+    db = sync_mongo_client.get_database(MONGODB_DB)
     alert_collection = db.get_collection("alerts")
 
     filter = {
@@ -249,13 +251,12 @@ async def read_alerts(
     filter = {k: v for k, v in filter.items() if v is not None}
 
     alerts_cursor = alert_collection.find(filter)
-    alerts = await alerts_cursor.to_list(length=None)
 
-    return [DBAlert(**{**alert, "_id": str(alert["_id"])}) for alert in alerts]
+    return [DBAlert(**{**alert, "_id": str(alert["_id"])}) for alert in list(alerts_cursor)]
 
 
-async def insert_alert(alert) -> Alert:
-    db = mongo_client.get_database(MONGODB_DB)
+def insert_alert(alert) -> Alert:
+    db = sync_mongo_client.get_database(MONGODB_DB)
     alert_collection = db.get_collection("alerts")
 
     alert_dict = alert.dict(by_alias=True, exclude={"id"})
@@ -263,7 +264,7 @@ async def insert_alert(alert) -> Alert:
     alert_dict["status"] = alert.status.value
     alert_dict["topic"] = alert.topic.value
 
-    result = await alert_collection.insert_one(alert_dict)
+    result = alert_collection.insert_one(alert_dict)
 
     alert.id = str(result.inserted_id)
     return alert

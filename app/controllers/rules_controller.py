@@ -57,5 +57,5 @@ async def get_device_rules(device_id: str):
 
 @router.get("/sensor")
 async def get_sensor_rules(device_id: str, sensor: str, reading: float):
-    rules = await execute_sensor_rules(device_id, sensor, reading)
+    rules = execute_sensor_rules(device_id, sensor, reading)
     return rules
