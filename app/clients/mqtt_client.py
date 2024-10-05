@@ -4,7 +4,7 @@ import json
 import paho.mqtt.client as mqtt
 
 from utils.logger import logger
-from utils.consts import TEMP_TOPIC, PH_TOPIC, EC_TOPIC, FLOATER_TOPIC
+from utils.consts import TEMP_TOPIC, PH_TOPIC, EC_TOPIC, FLOATER_TOPIC, HUMIDITY_TOPIC
 from clients.mongodb_client import insert_data
 
 
@@ -22,6 +22,7 @@ def on_connect(client, userdata, flags, reason_code, properties=None):
     else:
         logger.info("Connected to broker")
         client.subscribe(TEMP_TOPIC)
+        client.subscribe(HUMIDITY_TOPIC)
         client.subscribe(PH_TOPIC)
         client.subscribe(EC_TOPIC)
         client.subscribe(FLOATER_TOPIC)

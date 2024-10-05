@@ -54,8 +54,3 @@ async def get_device_rules(device_id: str):
             content={"message": f"No rules found for device {device_id}"},
         )
     return rules
-
-@router.get("/sensor")
-async def get_sensor_rules(device_id: str, sensor: str, reading: float):
-    rules = await execute_sensor_rules(device_id, sensor, reading)
-    return rules
