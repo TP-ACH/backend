@@ -32,7 +32,8 @@ def schedule_light_cycle(device_id, start_time, end_time):
         end_time = datetime.strptime(end_time, "%H:%M").time()
     except ValueError:
         logger.error("Invalid time format. Please use HH:MM")
-    scheduler.remove_all_jobs()
+    scheduler.remove_job(f"on_{device_id}")
+    scheduler.remove_job(f"off_{device_id}")
 
     scheduler.add_job(
         turn_on_light,
@@ -42,6 +43,7 @@ def schedule_light_cycle(device_id, start_time, end_time):
         second=start_time.second,
         timezone=timezone,
         args=[device_id],
+        id=f"on_{device_id}",
     )
 
     scheduler.add_job(
@@ -52,6 +54,7 @@ def schedule_light_cycle(device_id, start_time, end_time):
         second=end_time.second,
         timezone=timezone,
         args=[device_id],
+        id=f"off_{device_id}",
     )
 
     logger.info(f"Light cycle scheduled to start at {start_time} and end at {end_time}")
