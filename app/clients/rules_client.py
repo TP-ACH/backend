@@ -10,6 +10,7 @@ from models.rule import DefaultRuleBySpecies
 from models.rule import Rule
 from models.rule import RuleBySensor
 from models.rule import RulesByDevice
+from services.scheduler_service import schedule_light_cycle
 from utils.actions import Action
 from utils.comparison import Comparison
 from utils.logger import logger
@@ -44,6 +45,8 @@ async def get_default_species_rules(species: Species):
 
 
 async def add_device_rules(rules: RulesByDevice):
+    if rules.light_hours is not None:
+        schedule_light_cycle(rules.device, rules.light_hours.start, rules.light_hours.end)
     return await update_rules_by_device(rules)
 
 
