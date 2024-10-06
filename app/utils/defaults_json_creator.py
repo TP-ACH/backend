@@ -2,6 +2,7 @@ import csv
 import json
 from utils.consts import PUMP_PH_DOWN_TOPIC, PUMP_PH_UP_TOPIC, PUMP_NUTRIENT_TOPIC, PUMP_WATER_TOPIC, SWITCH_LIGHT_TOPIC
 from utils.alerts import Topic
+from datetime import datetime
 
 def create_rule(sensor, lower_bound, upper_bound, lower_action, upper_action):
     return {
@@ -67,6 +68,17 @@ def create_temperature_and_humidity_rules():
         },
     ]
 
+def create_light_rule(self, start, end):
+    try:
+        datetime.strptime(start, "%H:%M")
+        datetime.strptime(end, "%H:%M")
+    except ValueError:
+        raise ValueError(f"Time is not in the correct format '%H:%M'")
+    
+    return {
+        "start": start,
+        "end": end,
+    }
 
 def process_csv_to_json(csv_file):
     plants_data = []
@@ -79,7 +91,8 @@ def process_csv_to_json(csv_file):
             ph_upper = float(row["ph_upper"])
             ec_lower = float(row["ec_lower"])
             ec_upper = float(row["ec_upper"])
-            light_hours = int(row["light_hours"])
+            light_hours_start = str(row["light_hours_start"])
+            light_hours_end = str(row["light_hours_end"])
 
             plant_rules = {
                 "species": species,
@@ -88,7 +101,7 @@ def process_csv_to_json(csv_file):
                     create_rule("ec", ec_lower, ec_upper, PUMP_NUTRIENT_TOPIC, PUMP_WATER_TOPIC),
                 ]
                 + create_temperature_and_humidity_rules(),
-                "light_hours": light_hours,
+                "light_hours": create_light_rule(light_hours_start, light_hours_end),
             }
 
             plants_data.append(plant_rules)
