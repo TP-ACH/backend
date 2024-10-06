@@ -45,9 +45,10 @@ async def get_default_species_rules(species: Species):
 
 
 async def add_device_rules(rules: RulesByDevice):
-    if rules.light_hours is not None:
+    result = await update_rules_by_device(rules)
+    if result and rules.light_hours is not None:
         schedule_light_cycle(rules.device, rules.light_hours.start, rules.light_hours.end)
-    return await update_rules_by_device(rules)
+    return True
 
 
 async def read_device_rules(device_id: str):

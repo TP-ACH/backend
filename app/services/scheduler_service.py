@@ -2,6 +2,7 @@ import pytz
 from datetime import datetime
 from apscheduler.jobstores.mongodb import MongoDBJobStore
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
+from apscheduler.jobstores.base import JobLookupError
 from pymongo import MongoClient
 
 from clients.mongodb_client import MONGODB_DB
@@ -32,8 +33,14 @@ def schedule_light_cycle(device_id, start_time, end_time):
         end_time = datetime.strptime(end_time, "%H:%M").time()
     except ValueError:
         logger.error("Invalid time format. Please use HH:MM")
-    scheduler.remove_job(f"on_{device_id}")
-    scheduler.remove_job(f"off_{device_id}")
+    try:
+        scheduler.remove_job(f"on_{device_id}")
+    except JobLookupError:
+        logger.warning(f"No job by the id of on_{device_id} was found")
+    try:
+        scheduler.remove_job(f"off_{device_id}")
+    except JobLookupError:
+        logger.warning(f"No job by the id of off_{device_id} was found")
 
     scheduler.add_job(
         turn_on_light,
