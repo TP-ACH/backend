@@ -26,7 +26,7 @@ scheduler.start()
 logger.info("Scheduler started")
 
 
-def schedule_light_cycle(start_time, end_time):
+def schedule_light_cycle(device_id, start_time, end_time):
     try:
         start_time = datetime.strptime(start_time, "%H:%M").time()
         end_time = datetime.strptime(end_time, "%H:%M").time()
@@ -41,6 +41,7 @@ def schedule_light_cycle(start_time, end_time):
         minute=start_time.minute,
         second=start_time.second,
         timezone=timezone,
+        args=[device_id],
     )
 
     scheduler.add_job(
@@ -50,16 +51,19 @@ def schedule_light_cycle(start_time, end_time):
         minute=end_time.minute,
         second=end_time.second,
         timezone=timezone,
+        args=[device_id],
     )
 
     logger.info(f"Light cycle scheduled to start at {start_time} and end at {end_time}")
 
 
-def turn_on_light():
-    mqtt_client.publish_message(SWITCH_LIGHT_ON_TOPIC, "on")
-    logger.info("Light turned on")
+def turn_on_light(device_id):
+    topic = f"{device_id}/{SWITCH_LIGHT_ON_TOPIC}"
+    mqtt_client.publish_message(topic, "on")
+    logger.info(f"Light turned on for device: {device_id}")
 
 
-def turn_off_light():
-    mqtt_client.publish_message(SWITCH_LIGHT_OFF_TOPIC, "off")
-    logger.info("Light turned off")
+def turn_off_light(device_id):
+    topic = f"{device_id}/{SWITCH_LIGHT_OFF_TOPIC}"
+    mqtt_client.publish_message(topic, "off")
+    logger.info(f"Light turned off for device: {device_id}")
