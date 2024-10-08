@@ -171,11 +171,7 @@ async def add_new_sensor_with_rules(collection, device, sensor_rules):
         {"device": device}, {"$push": {"rules_by_sensor": sensor_rules.dict()}}
     )
 
-
-async def update_rules_by_device(rules_by_device):
-    db = mongo_client.get_database(MONGODB_DB)
-    devices_collection = db.get_collection("devices_rules")
-
+async def update_sensor_rules(rules_by_device, devices_collection):
     for sensor_update in rules_by_device.rules_by_sensor:
         logger.info(f"Updating rules for sensor: {sensor_update.sensor}")
         for rule_update in sensor_update.rules:
@@ -212,8 +208,28 @@ async def update_rules_by_device(rules_by_device):
             if added.matched_count == 0:
                 logger.info(f"Inserting new device entry for {rules_by_device.device}")
                 await devices_collection.insert_one(rules_by_device.dict())
-    return True
+                
+async def update_light_hours(rules_by_device, devices_collection):
+    logger.info(f"Updating light hours for device: {rules_by_device.device}")
+    updated = await devices_collection.update_one(
+        {
+            "device": rules_by_device.device,
+        },
+        {"$set": {"light_hours": rules_by_device.light_hours.dict()}},
+    )
+    if updated.matched_count == 0:
+        logger.info(f"Inserting new device entry for {rules_by_device.device}")
+        await devices_collection.insert_one(rules_by_device.dict())
 
+async def update_rules_by_device(rules_by_device):
+    db = mongo_client.get_database(MONGODB_DB)
+    devices_collection = db.get_collection("devices_rules")
+
+    if rules_by_device.rules_by_sensor:
+        await update_sensor_rules(rules_by_device, devices_collection)
+    if rules_by_device.light_hours:
+        await update_light_hours(rules_by_device, devices_collection)
+    return True
 
 async def get_device_rules(device_id: str):
     db = mongo_client.get_database(MONGODB_DB)
