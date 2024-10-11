@@ -1,8 +1,9 @@
 import csv
 import json
-from utils.consts import PUMP_PH_DOWN_TOPIC, PUMP_PH_UP_TOPIC, PUMP_NUTRIENT_TOPIC, PUMP_WATER_TOPIC, SWITCH_LIGHT_TOPIC
+from utils.consts import PUMP_PH_DOWN_TOPIC, PUMP_PH_UP_TOPIC, PUMP_NUTRIENT_TOPIC, PUMP_WATER_TOPIC
 from utils.alerts import Topic
 from datetime import datetime
+from utils.logger import logger
 
 def create_rule(sensor, lower_bound, upper_bound, lower_action, upper_action):
     return {
@@ -68,7 +69,7 @@ def create_temperature_and_humidity_rules():
         },
     ]
 
-def create_light_rule(self, start, end):
+def create_light_rule(start, end):
     try:
         datetime.strptime(start, "%H:%M")
         datetime.strptime(end, "%H:%M")
@@ -80,7 +81,7 @@ def create_light_rule(self, start, end):
         "end": end,
     }
 
-def process_csv_to_json(csv_file):
+def process_csv_to_json(csv_file="data/plants_defaults.csv"):
     plants_data = []
 
     with open(csv_file, mode="r") as file:
@@ -109,8 +110,8 @@ def process_csv_to_json(csv_file):
     return json.dumps(plants_data, indent=4)
 
 
-csv_file = "app/data/plants_defaults.csv"
-json_data = process_csv_to_json(csv_file)
+# csv_file = "app/data/plants_defaults.csv"
+# json_data = process_csv_to_json(csv_file)
 
-with open("plants_data.json", "w") as json_file:
-    json_file.write(json_data)
+# with open("plants_data.json", "w") as json_file:
+#     json_file.write(json_data)

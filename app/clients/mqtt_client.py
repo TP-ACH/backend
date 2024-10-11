@@ -49,15 +49,18 @@ def on_message(client, userdata, msg):
             insert_data(device_id, sensor, reading)
             
             from clients.rules_client import execute_sensor_rules
-            execute_sensor_rules(device_id, sensor, reading)
+            executed = execute_sensor_rules(device_id, sensor, reading)
+            if not executed:
+                logger.error(f"No rules executed for {device_id} and {sensor}")
             
         else:
             logger.error(f"Invalid message received: {data}")
 
     except ValueError:
         logger.error(f"Failed to convert reading to float")
-    except Exception:
+    except Exception as e:
         logger.error(f"Something went wrong, data received: {msg.payload}")
+        logger.error(f"Error: {e.with_traceback()}")
 
 
 class MQTTClient:
