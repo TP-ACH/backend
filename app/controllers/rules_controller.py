@@ -5,11 +5,10 @@ from utils.species import Species
 from models.rule import RulesByDevice
 from services.auth_service import get_current_user
 from clients.rules_client import (
-    set_default_rules,
+    init_species_rules,
     get_default_species_rules,
     add_device_rules,
     read_device_rules,
-    execute_sensor_rules,
 )
 
 
@@ -17,8 +16,12 @@ router = APIRouter(dependencies=[Depends(get_current_user)])
 
 
 @router.post("/default")
-async def set_default(species: Species):
-    return await set_default_rules(species)
+async def init_rules():
+    if await init_species_rules():
+        return JSONResponse(
+            status_code=200, content={"message": "Default rules set successfully"}
+        )
+    return JSONResponse(status_code=500, content={"message": "Error setting default rules"})
 
 
 @router.get("/default")

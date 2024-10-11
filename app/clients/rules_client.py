@@ -13,28 +13,32 @@ from models.rule import RulesByDevice
 from services.scheduler_service import schedule_light_cycle
 from utils.actions import Action
 from utils.comparison import Comparison
+from utils.defaults_json_creator import process_csv_to_json
 from utils.logger import logger
 from utils.species import Species
 
 
 rule_failure_counts = {}
 
-async def set_default_rules(species: Species):
+async def init_species_rules():
     try:
-        with open("data/default_rules.json", "r") as file:
-            data = json.load(file)
-            species_defaults = [
-                DefaultRuleBySpecies(**species_rules) for species_rules in data
-            ]
+        if await get_species_defaults(Species.LECHUGA.value):
+            logger.info("Default rules already set.")
+            return True
 
-            await insert_species_defaults(species_defaults)
+        default_data = process_csv_to_json()
+        data = json.loads(default_data)
+        species_defaults = [
+            DefaultRuleBySpecies(**species_rules) for species_rules in data
+        ]
 
-            logger.info("Default rules successfully set.")
+        await insert_species_defaults(species_defaults)
 
-    except FileNotFoundError:
-        logger.error("File 'default_rules.json' was not found.")
+        logger.info("Default rules successfully set.")
+        return True
     except json.JSONDecodeError as e:
         logger.error(f"Error decoding the JSON file: {str(e)}")
+        return False
 
 
 async def get_default_species_rules(species: Species):
@@ -58,13 +62,15 @@ async def read_device_rules(device_id: str):
 
 def execute_sensor_rules(device_id: str, sensor: str, reading):
     rules = sync_get_sensor_rules(device_id, sensor)
+    if not rules:
+        return False
     sensor_rules = RuleBySensor(**rules)
     
     for rule in sensor_rules.rules:
         if evaluate_rule(device_id, sensor, rule, reading):
             execute_action(device_id, rule.action, reading, rule.bound)
     
-    return sensor_rules
+    return True
 
 
 def evaluate_rule(device_id: str, sensor:str, rule: Rule, reading: float) -> bool:
