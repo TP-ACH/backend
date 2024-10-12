@@ -5,6 +5,7 @@ import paho.mqtt.client as mqtt
 
 from utils.logger import logger
 from utils.consts import TEMP_TOPIC, PH_TOPIC, EC_TOPIC, FLOATER_TOPIC, HUMIDITY_TOPIC
+from utils.utils import value_in_range
 from clients.mongodb_client import insert_data
 
 
@@ -42,7 +43,7 @@ def on_message(client, userdata, msg):
         data = json.loads(msg.payload.decode("utf-8"))
 
         reading = float(data.get("reading", None))
-        if device_id and reading:
+        if device_id and reading and value_in_range(sensor, reading):
             logger.info(
                 f"Received message from topic: {sensor}, device: {device_id} and reading: {reading}"
             )
