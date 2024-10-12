@@ -12,3 +12,4 @@ SWITCH_LIGHT_OFF_TOPIC = "actuators/light_off"
 SWITCH_LIGHT_ON_TOPIC = "actuators/light_on"
 
 TIMEZONE = "America/Buenos_Aires"
+TIME_THRESHOLD = 5

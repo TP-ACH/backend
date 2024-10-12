@@ -21,7 +21,9 @@ async def init_rules():
         return JSONResponse(
             status_code=200, content={"message": "Default rules set successfully"}
         )
-    return JSONResponse(status_code=500, content={"message": "Error setting default rules"})
+    return JSONResponse(
+        status_code=500, content={"message": "Error setting default rules"}
+    )
 
 
 @router.get("/default")

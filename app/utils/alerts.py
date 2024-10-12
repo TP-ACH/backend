@@ -36,10 +36,10 @@ class Topic(Enum):
 
 TOPIC_MESSAGES = {
     Topic.CONNECTION_LOST: "Se perdió la conexión con el microcontrolador",
-    Topic.PH_FAIL: "El sensor de Ph no funciona",
-    Topic.EC_FAIL: "El sensor de EC no funciona",
-    Topic.HUMIDITY_FAIL: "El sensor de humedad no funciona",
-    Topic.TEMPERATURE_FAIL: "El sensor de temperatura no funciona",
+    Topic.PH_FAIL: "Se perdió la conexión con el sensor de Ph",
+    Topic.EC_FAIL: "Se perdió la conexión con el sensor de EC",
+    Topic.HUMIDITY_FAIL: "Se perdió la conexión con el sensor de humedad",
+    Topic.TEMPERATURE_FAIL: "Se perdió la conexión con el sensor de temperatura",
     Topic.PH_UP: "El valor de Ph está elevado",
     Topic.PH_DOWN: "El valor de Ph es bajo",
     Topic.EC_UP: "El valor de EC está elevado",
