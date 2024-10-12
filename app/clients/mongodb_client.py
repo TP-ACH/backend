@@ -378,6 +378,12 @@ async def delete_alert(id: str):
     result = await alert_collection.delete_one({"_id": ObjectId(id)})
     return result.deleted_count > 0
 
+async def fetch_devices():
+    devices = await mongo_client.list_database_names()
+    excluded_databases = ["admin", "config", "local", MONGODB_DB]
+    filtered_devices = [db for db in devices if db not in excluded_databases]
+    return filtered_devices
+
 
 async def get_latest_sensor_readings():
     latest_readings = {}
