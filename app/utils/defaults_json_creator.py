@@ -1,9 +1,15 @@
 import csv
 import json
-from utils.consts import PUMP_PH_DOWN_TOPIC, PUMP_PH_UP_TOPIC, PUMP_NUTRIENT_TOPIC, PUMP_WATER_TOPIC
+from utils.consts import (
+    PUMP_PH_DOWN_TOPIC,
+    PUMP_PH_UP_TOPIC,
+    PUMP_NUTRIENT_TOPIC,
+    PUMP_WATER_TOPIC,
+)
 from utils.alerts import Topic
 from datetime import datetime
 from utils.logger import logger
+
 
 def create_rule(sensor, lower_bound, upper_bound, lower_action, upper_action):
     return {
@@ -91,12 +97,13 @@ def create_light_rule(start, end):
         datetime.strptime(end, "%H:%M")
     except ValueError:
         raise ValueError(f"Time is not in the correct format '%H:%M'")
-    
+
     return {
         "start": start,
         "end": end,
     }
     
+
 
 def process_csv_to_json(csv_file="data/plants_defaults.csv"):
     plants_data = []
@@ -115,8 +122,12 @@ def process_csv_to_json(csv_file="data/plants_defaults.csv"):
             plant_rules = {
                 "species": species,
                 "rules_by_sensor": [
-                    create_rule("ph", ph_lower, ph_upper, PUMP_PH_UP_TOPIC, PUMP_PH_DOWN_TOPIC),
-                    create_rule("ec", ec_lower, ec_upper, PUMP_NUTRIENT_TOPIC, PUMP_WATER_TOPIC),
+                    create_rule(
+                        "ph", ph_lower, ph_upper, PUMP_PH_UP_TOPIC, PUMP_PH_DOWN_TOPIC
+                    ),
+                    create_rule(
+                        "ec", ec_lower, ec_upper, PUMP_NUTRIENT_TOPIC, PUMP_WATER_TOPIC
+                    ),
                 ]
                 + create_temperature_and_humidity_rules()
                 + create_floater_rule(),

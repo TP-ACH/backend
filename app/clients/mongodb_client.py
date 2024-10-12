@@ -171,6 +171,7 @@ async def add_new_sensor_with_rules(collection, device, sensor_rules):
         {"device": device}, {"$push": {"rules_by_sensor": sensor_rules.dict()}}
     )
 
+
 async def update_sensor_rules(rules_by_device, devices_collection):
     for sensor_update in rules_by_device.rules_by_sensor:
         logger.info(f"Updating rules for sensor: {sensor_update.sensor}")
@@ -208,7 +209,8 @@ async def update_sensor_rules(rules_by_device, devices_collection):
             if added.matched_count == 0:
                 logger.info(f"Inserting new device entry for {rules_by_device.device}")
                 await devices_collection.insert_one(rules_by_device.dict())
-                
+
+
 async def update_light_hours(rules_by_device, devices_collection):
     logger.info(f"Updating light hours for device: {rules_by_device.device}")
     updated = await devices_collection.update_one(
@@ -221,6 +223,7 @@ async def update_light_hours(rules_by_device, devices_collection):
         logger.info(f"Inserting new device entry for {rules_by_device.device}")
         await devices_collection.insert_one(rules_by_device.dict())
 
+
 async def update_rules_by_device(rules_by_device):
     db = mongo_client.get_database(MONGODB_DB)
     devices_collection = db.get_collection("devices_rules")
@@ -231,6 +234,7 @@ async def update_rules_by_device(rules_by_device):
         await update_light_hours(rules_by_device, devices_collection)
     return True
 
+
 async def get_device_rules(device_id: str):
     db = mongo_client.get_database(MONGODB_DB)
     devices_collection = db.get_collection("devices_rules")
@@ -240,25 +244,36 @@ async def get_device_rules(device_id: str):
         rules.pop("_id", None)
     return rules
 
+
 async def get_sensor_rules(device_id: str, sensor: str):
     db = mongo_client.get_database(MONGODB_DB)
     devices_collection = db.get_collection("devices_rules")
 
-    device_rules = await devices_collection.find_one({"device": device_id, "rules_by_sensor.sensor": sensor})
+    device_rules = await devices_collection.find_one(
+        {"device": device_id, "rules_by_sensor.sensor": sensor}
+    )
     if not device_rules:
         return None
-    sensor_rules = next((s for s in device_rules["rules_by_sensor"] if s["sensor"] == sensor), None)
+    sensor_rules = next(
+        (s for s in device_rules["rules_by_sensor"] if s["sensor"] == sensor), None
+    )
     return sensor_rules
+
 
 def sync_get_sensor_rules(device_id: str, sensor: str):
     db = sync_mongo_client.get_database(MONGODB_DB)
     devices_collection = db.get_collection("devices_rules")
 
-    device_rules = devices_collection.find_one({"device": device_id, "rules_by_sensor.sensor": sensor})
+    device_rules = devices_collection.find_one(
+        {"device": device_id, "rules_by_sensor.sensor": sensor}
+    )
     if not device_rules:
         return None
-    sensor_rules = next((s for s in device_rules["rules_by_sensor"] if s["sensor"] == sensor), None)
+    sensor_rules = next(
+        (s for s in device_rules["rules_by_sensor"] if s["sensor"] == sensor), None
+    )
     return sensor_rules
+
 
 async def read_alerts(
     device_id=None, type=None, status=None, topic=None
@@ -278,10 +293,9 @@ async def read_alerts(
     alerts = await alerts_cursor.to_list(length=None)
 
     return [DBAlert(**{**alert, "_id": str(alert["_id"])}) for alert in alerts]
-    
-def sync_read_alerts(
-    device_id=None, type=None, status=None, topic=None
-) -> list[Alert]:
+
+
+def sync_read_alerts(device_id=None, type=None, status=None, topic=None) -> list[Alert]:
     db = sync_mongo_client.get_database(MONGODB_DB)
     alert_collection = db.get_collection("alerts")
 
@@ -295,7 +309,10 @@ def sync_read_alerts(
 
     alerts_cursor = alert_collection.find(filter)
 
-    return [DBAlert(**{**alert, "_id": str(alert["_id"])}) for alert in list(alerts_cursor)]
+    return [
+        DBAlert(**{**alert, "_id": str(alert["_id"])}) for alert in list(alerts_cursor)
+    ]
+
 
 async def insert_alert(alert) -> Alert:
     db = mongo_client.get_database(MONGODB_DB)
@@ -310,6 +327,7 @@ async def insert_alert(alert) -> Alert:
 
     alert.id = str(result.inserted_id)
     return alert
+
 
 def sync_insert_alert(alert) -> Alert:
     db = sync_mongo_client.get_database(MONGODB_DB)
@@ -347,3 +365,45 @@ async def delete_alert(id: str):
 
     result = await alert_collection.delete_one({"_id": ObjectId(id)})
     return result.deleted_count > 0
+
+
+async def get_latest_sensor_readings():
+    latest_readings = {}
+    databases = await mongo_client.list_database_names()
+
+    for db_name in databases:
+        if db_name in ["admin", "config", "local", os.getenv("MONGO_INITDB_DATABASE")]:
+            continue
+
+        db = mongo_client.get_database(db_name)
+        latest_readings[db_name] = {}
+        sensors = await db.list_collection_names()
+
+        for sensor in sensors:
+            collection = db.get_collection(sensor)
+            pipeline = [
+                {"$sort": {"created_at": -1}},
+                {
+                    "$group": {
+                        "_id": None,
+                        "reading": {"$first": "$reading"},
+                        "created_at": {
+                            "$first": {
+                                "$dateToString": {
+                                    "format": "%Y-%m-%d %H:%M:%S",
+                                    "date": "$created_at",
+                                    "timezone": "America/Sao_Paulo",
+                                }
+                            }
+                        },
+                    }
+                },
+                {"$project": {"_id": 0, "reading": 1, "created_at": 1}},
+            ]
+
+            latest_entry = await collection.aggregate(pipeline).to_list(length=None)
+
+            if latest_entry:
+                latest_readings[db_name][sensor] = latest_entry
+
+    return latest_readings

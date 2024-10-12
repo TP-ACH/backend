@@ -1,4 +1,5 @@
 .env
+.venv
 *.pyc
 mongodb/mongo_data/*
 mosquitto/data/*

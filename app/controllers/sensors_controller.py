@@ -6,6 +6,7 @@ from fastapi import Response, APIRouter, Depends
 from fastapi.responses import JSONResponse
 
 from services.auth_service import get_current_user
+from services.scheduler_service import sensors_heartbeat
 from clients.mongodb_client import fetch_data, validate_connection
 
 from utils.logger import logger
@@ -16,6 +17,7 @@ router = APIRouter(dependencies=[Depends(get_current_user)])
 
 @router.on_event("startup")
 async def startup_event():
+    sensors_heartbeat()
     try:
         await validate_connection()
     except Exception as e:

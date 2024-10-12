@@ -1,9 +1,10 @@
 from enum import Enum
 
+
 class Comparison(Enum):
     GREATER = "greater"
-    LESS    = "less"
-    
+    LESS = "less"
+
     def compare(self, reading: float, bound: float) -> bool:
         if self == Comparison.GREATER:
             return reading > bound
