@@ -20,6 +20,7 @@ from utils.species import Species
 
 rule_failure_counts = {}
 
+
 async def init_species_rules():
     try:
         if await get_species_defaults(Species.LECHUGA.value):
@@ -51,7 +52,9 @@ async def get_default_species_rules(species: Species):
 async def add_device_rules(rules: RulesByDevice):
     result = await update_rules_by_device(rules)
     if result and rules.light_hours is not None:
-        schedule_light_cycle(rules.device, rules.light_hours.start, rules.light_hours.end)
+        schedule_light_cycle(
+            rules.device, rules.light_hours.start, rules.light_hours.end
+        )
     return True
 
 
@@ -65,35 +68,38 @@ def execute_sensor_rules(device_id: str, sensor: str, reading):
     if not rules:
         return False
     sensor_rules = RuleBySensor(**rules)
-    
+
     for rule in sensor_rules.rules:
         if evaluate_rule(device_id, sensor, rule, reading):
             execute_action(device_id, rule.action, reading, rule.bound)
-    
+
     return True
 
 
-def evaluate_rule(device_id: str, sensor:str, rule: Rule, reading: float) -> bool:
+def evaluate_rule(device_id: str, sensor: str, rule: Rule, reading: float) -> bool:
     global rule_failure_counts
-    
+
     out_of_bounds = Comparison(rule.compare.lower()).compare(reading, rule.bound)
-    
+
     rule_key = (device_id, sensor, rule.bound, rule.compare)
-        
+
     if rule_key not in rule_failure_counts:
         rule_failure_counts[rule_key] = 0
-    
+
     if out_of_bounds:
         rule_failure_counts[rule_key] += 1
-        logger.info(f"Reading out of bounds. Counter for {rule_key}: {rule_failure_counts[rule_key]}")
-        
+        logger.info(
+            f"Reading out of bounds. Counter for {rule_key}: {rule_failure_counts[rule_key]}"
+        )
+
         if rule_failure_counts[rule_key] >= rule.time:
             rule_failure_counts[rule_key] = 0
             return True
     else:
         rule_failure_counts[rule_key] = 0
-        
-    return False    
-    
+
+    return False
+
+
 def execute_action(device_id, action: Action, reading: float, bound: float):
     Action(action.type.lower()).execute(device_id, action, reading, bound)

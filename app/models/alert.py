@@ -16,8 +16,14 @@ class DBAlert(BaseModel):
 
     @classmethod
     def from_topic(cls, device_id: str, topic: Topic) -> "DBAlert":
-        return cls(device_id=device_id, type=TOPIC_TYPE_MAP[topic], status=Status.OPEN, topic=topic)
-    
+        return cls(
+            device_id=device_id,
+            type=TOPIC_TYPE_MAP[topic],
+            status=Status.OPEN,
+            topic=topic,
+        )
+
+
 class Alert(DBAlert):
     message: str
 

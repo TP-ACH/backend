@@ -47,12 +47,13 @@ def on_message(client, userdata, msg):
                 f"Received message from topic: {sensor}, device: {device_id} and reading: {reading}"
             )
             insert_data(device_id, sensor, reading)
-            
+
             from clients.rules_client import execute_sensor_rules
+
             executed = execute_sensor_rules(device_id, sensor, reading)
             if not executed:
                 logger.error(f"No rules executed for {device_id} and {sensor}")
-            
+
         else:
             logger.error(f"Invalid message received: {data}")
 

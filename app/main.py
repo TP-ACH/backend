@@ -35,6 +35,7 @@ app.include_router(rules_router, prefix="/rules", tags=["App"])
 app.include_router(alerts_router, prefix="/alerts", tags=["App"])
 app.include_router(users_router, prefix="/users", tags=["App"])
 
+
 @app.get("/")
 def read_root():
     return {"Hello": "World"}

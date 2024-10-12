@@ -1,7 +1,13 @@
 from models.alert import Alert, DBAlert, AlertUpdate
 from utils.alerts import Status, Type, Topic, TOPIC_MESSAGES
 from utils.logger import logger
-from clients.mongodb_client import read_alerts, insert_alert, update_alert, sync_read_alerts, sync_insert_alert
+from clients.mongodb_client import (
+    read_alerts,
+    insert_alert,
+    update_alert,
+    sync_read_alerts,
+    sync_insert_alert,
+)
 
 
 async def get_alerts_with_message(
@@ -9,6 +15,7 @@ async def get_alerts_with_message(
 ) -> list[Alert]:
     db_alerts = await read_alerts(device_id, type, status, topic)
     return [Alert.from_db_alert(db_alert) for db_alert in db_alerts]
+
 
 async def create_new_alert(alert: DBAlert):
     if alert.status in [Status.OPEN, Status.PENDING]:
@@ -29,8 +36,9 @@ async def create_new_alert(alert: DBAlert):
             f"Alert already exists with id {existing_alerts[0].id}. Skipping creation."
         )
         return existing_alerts[0]
-    
+
     return Alert.from_db_alert(await insert_alert(alert))
+
 
 def sync_create_new_alert(alert: DBAlert):
     if alert.status in [Status.OPEN, Status.PENDING]:
@@ -51,7 +59,7 @@ def sync_create_new_alert(alert: DBAlert):
             f"Alert already exists with id {existing_alerts[0].id}. Skipping creation."
         )
         return existing_alerts[0]
-    
+
     return Alert.from_db_alert(sync_insert_alert(alert))
 
 
