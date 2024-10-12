@@ -16,6 +16,7 @@ from utils.comparison import Comparison
 from utils.defaults_json_creator import process_csv_to_json
 from utils.logger import logger
 from utils.species import Species
+from utils.utils import value_in_range
 
 
 rule_failure_counts = {}
@@ -50,11 +51,39 @@ async def get_default_species_rules(species: Species):
 
 
 async def add_device_rules(rules: RulesByDevice):
+    if not validate_rules(rules):
+        return False
     result = await update_rules_by_device(rules)
     if result and rules.light_hours is not None:
         schedule_light_cycle(
             rules.device, rules.light_hours.start, rules.light_hours.end
         )
+    return True
+
+def validate_rules(rules: RulesByDevice):
+    if rules.light_hours is not None:
+        if not validate_rule_bounds("light_hours", rules.light_hours.start, rules.light_hours.end):
+            return False
+    
+    for sensor_rules in rules.rules_by_sensor:
+        lower_bound, upper_bound = None, None
+        for rule in sensor_rules.rules:
+            if rule.compare == Comparison.GREATER.value:
+                upper_bound = rule.bound
+            else:
+                lower_bound = rule.bound
+        if not validate_rule_bounds(sensor_rules.sensor, upper_bound, lower_bound):
+            return False
+    
+    return True
+
+def validate_rule_bounds(metric, upper, lower):
+    if upper is not None and lower is not None and metric != "light_hours" and upper < lower:
+        logger.error(f"Upper bound {upper} is less than lower bound {lower} for metric {metric}")
+        return False
+    if (upper is not None and not value_in_range(metric, upper)) or (lower is not None and not value_in_range(metric, lower)):
+        logger.error(f"Bounds are out of range for metric {metric}")
+        return False
     return True
 
 
