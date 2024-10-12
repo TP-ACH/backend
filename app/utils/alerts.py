@@ -32,6 +32,7 @@ class Topic(Enum):
     LIGHTS_ON = "lights_on"  # Se prendieron las luces
     PH_OK = "ph_ok"  # Se estabilizo el ph
     EC_OK = "ec_ok"  # Se estabilizo la EC
+    WATER_DOWN = "water_down"  # El nivel de agua es bajo
 
 
 TOPIC_MESSAGES = {
@@ -52,6 +53,7 @@ TOPIC_MESSAGES = {
     Topic.LIGHTS_ON: "Se prendieron las luces",
     Topic.PH_OK: "Se estabilizó el pH",
     Topic.EC_OK: "Se estabilizó la EC",
+    Topic.WATER_DOWN: "El nivel de agua es bajo",
 }
 
 TOPIC_TYPE_MAP = {
