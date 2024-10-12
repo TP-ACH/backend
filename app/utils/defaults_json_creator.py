@@ -75,6 +75,21 @@ def create_temperature_and_humidity_rules():
         },
     ]
 
+def create_floater_rule(floater):
+    return [
+        {
+            "sensor": "floater",
+            "rules": [
+                {
+                    "bound": 0,
+                    "compare": "greater",
+                    "time": 5,
+                    "enabled": 1,
+                    "action": {"type": "alert", "dest": Topic.WATER_DOWN.value},
+                },
+            ],
+        }
+    ]
 
 def create_light_rule(start, end):
     try:
@@ -87,6 +102,7 @@ def create_light_rule(start, end):
         "start": start,
         "end": end,
     }
+    
 
 
 def process_csv_to_json(csv_file="data/plants_defaults.csv"):
@@ -113,7 +129,8 @@ def process_csv_to_json(csv_file="data/plants_defaults.csv"):
                         "ec", ec_lower, ec_upper, PUMP_NUTRIENT_TOPIC, PUMP_WATER_TOPIC
                     ),
                 ]
-                + create_temperature_and_humidity_rules(),
+                + create_temperature_and_humidity_rules()
+                + create_floater_rule(),
                 "light_hours": create_light_rule(light_hours_start, light_hours_end),
             }
 
