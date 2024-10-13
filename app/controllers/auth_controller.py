@@ -29,7 +29,7 @@ async def register_user(new_user: UserRegister):
     return Response(status_code=201)
 
 
-@router.post("/login")
+@router.post("/login", response_model=Token)
 async def login_for_access_token(
     form_data: Annotated[OAuth2PasswordRequestForm, Depends()],
 ) -> Token:
