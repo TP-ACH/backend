@@ -4,6 +4,7 @@ from fastapi.responses import JSONResponse
 from utils.species import Species
 from models.rule import RulesByDevice
 from services.auth_service import get_current_user
+from typing import List
 from clients.rules_client import (
     init_species_rules,
     get_default_species_rules,
@@ -59,3 +60,9 @@ async def get_device_rules(device_id: str):
             content={"message": f"No rules found for device {device_id}"},
         )
     return rules
+
+@router.get("/species", response_model=List[Species])
+async def get_species():
+    return JSONResponse(
+        status_code=200, content={"species": [species.value for species in Species]}
+    )
