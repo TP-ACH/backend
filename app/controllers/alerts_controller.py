@@ -10,19 +10,20 @@ from clients.alerts_client import (
     get_alerts_with_message,
 )
 from services.auth_service import get_current_user
+from typing import List
 
 
 router = APIRouter(dependencies=[Depends(get_current_user)])
 
 
-@router.get("/")
+@router.get("/", response_model=List[Alert])
 async def get_alerts(
     device_id: str = None, type: Type = None, status: Status = None, topic: Topic = None
 ):
     return await get_alerts_with_message(device_id, type, status, topic)
 
 
-@router.post("/")
+@router.post("/", response_model=Alert)
 async def create_alert(alert: DBAlert):
     return await create_new_alert(alert)
 
