@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends
 from fastapi.responses import JSONResponse
 
 from utils.species import Species
-from models.rule import RulesByDevice
+from models.rule import RulesByDevice, DefaultRuleBySpecies
 from services.auth_service import get_current_user
 from typing import List
 from clients.rules_client import (
@@ -27,7 +27,7 @@ async def init_rules():
     )
 
 
-@router.get("/default")
+@router.get("/default", response_model=DefaultRuleBySpecies)
 async def get_default_rules(species: Species):
     rules = await get_default_species_rules(species)
     if not rules:
@@ -51,7 +51,7 @@ async def add_device_rule(rules: RulesByDevice):
     )
 
 
-@router.get("/device")
+@router.get("/device", response_model=RulesByDevice)
 async def get_device_rules(device_id: str):
     rules = await read_device_rules(device_id)
     if not rules:

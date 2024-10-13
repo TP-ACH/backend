@@ -7,7 +7,7 @@ from services.auth_service import get_current_user, get_password_hash
 router = APIRouter(dependencies=[Depends(get_current_user)])
 
 
-@router.get("/me")
+@router.get("/me", response_model=UserResponse)
 async def get_user_info(user=Depends(get_current_user)):
     return UserResponse(
         username=user.username,
@@ -16,7 +16,7 @@ async def get_user_info(user=Depends(get_current_user)):
     )
 
 
-@router.put("/update")
+@router.put("/update", response_model=UserResponse)
 async def update_user_info(user_update: UserUpdate, user=Depends(get_current_user)):
     if user_update.password:
         user_update.password = get_password_hash(user_update.password)
