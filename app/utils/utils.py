@@ -1,5 +1,17 @@
 from datetime import datetime
-from utils.consts import MIN_EC, MAX_EC, MIN_TEMP, MAX_TEMP, MIN_HUMIDITY, MAX_HUMIDITY, MIN_FLOATER, MAX_FLOATER, MIN_PH, MAX_PH
+from utils.consts import (
+    MIN_EC,
+    MAX_EC,
+    MIN_TEMP,
+    MAX_TEMP,
+    MIN_HUMIDITY,
+    MAX_HUMIDITY,
+    MIN_FLOATER,
+    MAX_FLOATER,
+    MIN_PH,
+    MAX_PH,
+)
+
 
 def value_in_range(metric, value):
     ranges = {
@@ -12,7 +24,7 @@ def value_in_range(metric, value):
 
     if metric == "light_hours":
         return is_valid_light_hours(value)
-    
+
     return is_value_in_ranges(metric, value, ranges)
 
 

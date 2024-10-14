@@ -61,6 +61,7 @@ async def get_device_rules(device_id: str):
         )
     return rules
 
+
 @router.get("/species", response_model=List[Species])
 async def get_species():
     return JSONResponse(

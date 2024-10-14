@@ -75,6 +75,7 @@ def create_temperature_and_humidity_rules():
         },
     ]
 
+
 def create_floater_rule(floater):
     return [
         {
@@ -91,6 +92,7 @@ def create_floater_rule(floater):
         }
     ]
 
+
 def create_light_rule(start, end):
     try:
         datetime.strptime(start, "%H:%M")
@@ -102,7 +104,6 @@ def create_light_rule(start, end):
         "start": start,
         "end": end,
     }
-    
 
 
 def process_csv_to_json(csv_file="data/plants_defaults.csv"):

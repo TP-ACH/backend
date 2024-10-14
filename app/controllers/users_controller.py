@@ -30,3 +30,22 @@ async def update_user_info(user_update: UserUpdate, user=Depends(get_current_use
         first_name=updated_user.first_name,
         last_name=updated_user.last_name,
     )
+
+
+@router.get("/host-ip")
+async def host_ip():
+    ip = get_host_ip()
+    return {"host_ip": ip}
+
+
+def get_host_ip():
+    try:
+        import socket
+
+        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        s.connect(("8.8.8.8", 80))
+        ip = s.getsockname()[0]
+        s.close()
+        return ip
+    except Exception as e:
+        return str(e)
