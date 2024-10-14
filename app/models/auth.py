@@ -20,7 +20,7 @@ class User(BaseModel):
 
 class UserRegister(BaseModel):
     user: User
-    device_id: str
+    access_token: str
 
 
 class UserUpdate(BaseModel):
