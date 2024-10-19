@@ -12,9 +12,10 @@ from models.auth import TokenData
 from clients.mongodb_client import get_user
 
 
-SECRET_KEY = os.environ.get("SECRET_KEY")
 ALGORITHM = "HS256"
-ACCESS_TOKEN_EXPIRE_MINUTES = 30
+JWT_TOKEN_EXPIRE_MINUTES = 30
+ACCESS_TOKEN = os.environ.get("ACCESS_TOKEN")
+SECRET_KEY = os.environ.get("SECRET_KEY")
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="auth/login")
@@ -22,6 +23,10 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="auth/login")
 
 def verify_password(plain_password, hashed_password):
     return pwd_context.verify(plain_password, hashed_password)
+
+
+def validate_access_token(token: str) -> bool:
+    return token == ACCESS_TOKEN
 
 
 def get_password_hash(password):
@@ -56,7 +61,7 @@ async def generate_token(username, password):
             detail="Incorrect username or password",
             headers={"WWW-Authenticate": "Bearer"},
         )
-    access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+    access_token_expires = timedelta(minutes=JWT_TOKEN_EXPIRE_MINUTES)
     return create_access_token(
         data={"sub": user.username}, expires_delta=access_token_expires
     )
