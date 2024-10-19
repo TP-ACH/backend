@@ -86,8 +86,4 @@ class MQTTClient:
                 time.sleep(5)
 
     def publish_message(self, topic, message):
-        res = self.client.publish(topic, message)
-        res.wait_for_publish(15)
-        if res.rc == mqtt.MQTT_ERR_SUCCESS:
-            return True
-        return False
+        self.client.publish(topic, message, qos=1)
