@@ -65,15 +65,16 @@ def validate_rules(rules: RulesByDevice):
         if not validate_rule_bounds("light_hours", rules.light_hours.start, rules.light_hours.end):
             return False
     
-    for sensor_rules in rules.rules_by_sensor:
-        lower_bound, upper_bound = None, None
-        for rule in sensor_rules.rules:
-            if rule.compare == Comparison.GREATER.value:
-                upper_bound = rule.bound
-            else:
-                lower_bound = rule.bound
-        if not validate_rule_bounds(sensor_rules.sensor, upper_bound, lower_bound):
-            return False
+    if rules.rules_by_sensor:
+        for sensor_rules in rules.rules_by_sensor:
+            lower_bound, upper_bound = None, None
+            for rule in sensor_rules.rules:
+                if rule.compare == Comparison.GREATER.value:
+                    upper_bound = rule.bound
+                else:
+                    lower_bound = rule.bound
+            if not validate_rule_bounds(sensor_rules.sensor, upper_bound, lower_bound):
+                return False
     
     return True
 
