@@ -43,7 +43,7 @@ def on_message(client, userdata, msg):
         data = json.loads(msg.payload.decode("utf-8"))
 
         reading = float(data.get("reading", None))
-        if device_id and reading and value_in_range(sensor, reading):
+        if device_id and reading is not None and value_in_range(sensor, reading):
             logger.info(
                 f"Received message from topic: {sensor}, device: {device_id} and reading: {reading}"
             )
