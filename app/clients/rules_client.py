@@ -113,7 +113,7 @@ def execute_sensor_rules(device_id: str, sensor: str, reading):
 
     for rule in sensor_rules.rules:
         if evaluate_rule(device_id, sensor, rule, reading):
-            execute_action(device_id, rule.action, reading, rule.bound)
+            execute_action(device_id, sensor, rule.action, reading, rule.bound)
 
     return True
 
@@ -143,5 +143,5 @@ def evaluate_rule(device_id: str, sensor: str, rule: Rule, reading: float) -> bo
     return False
 
 
-def execute_action(device_id, action: Action, reading: float, bound: float):
-    Action(action.type.lower()).execute(device_id, action, reading, bound)
+def execute_action(device_id, sensor, action: Action, reading: float, bound: float):
+    Action(action.type.lower()).execute(device_id, sensor, action, reading, bound)
