@@ -18,11 +18,15 @@ class Action(Enum):
 
     def _execute_mqtt(self, device_id, sensor, action, reading: float, bound: float):
         topic = f"{device_id}/{action.dest}"
-        logger.info(f"Sending MQTT message to {topic}. Reading: {reading}, Bound: {bound}")
+        logger.info(
+            f"Sending MQTT message to {topic}. Reading: {reading}, Bound: {bound}"
+        )
         mqtt_client.publish_message(topic, reading)
         logger.info(f"Creating alert for {device_id} of type {sensor}_ok")
         sync_create_new_alert(DBAlert.from_topic(device_id, Topic(f"{sensor}_ok")))
 
     def _execute_alert(self, device_id, action, reading: float, bound: float):
-        logger.info(f"Sending alert to {action.dest}. Reading: {reading}, Bound: {bound}")
+        logger.info(
+            f"Sending alert to {action.dest}. Reading: {reading}, Bound: {bound}"
+        )
         sync_create_new_alert(DBAlert.from_topic(device_id, Topic(action.dest.lower())))
