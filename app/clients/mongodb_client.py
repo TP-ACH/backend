@@ -171,6 +171,7 @@ async def add_new_sensor_with_rules(collection, device, sensor_rules):
         {"device": device}, {"$push": {"rules_by_sensor": sensor_rules.dict()}}
     )
 
+
 async def update_device_species(rules_by_device, devices_collection):
     logger.info(f"Updating selected species for device: {rules_by_device.device}")
     updated = await devices_collection.update_one(
@@ -182,6 +183,7 @@ async def update_device_species(rules_by_device, devices_collection):
     if updated.matched_count == 0:
         logger.info(f"Inserting new device entry for {rules_by_device.device}")
         await devices_collection.insert_one(rules_by_device.dict())
+
 
 async def update_sensor_rules(rules_by_device, devices_collection):
     for sensor_update in rules_by_device.rules_by_sensor:
@@ -377,6 +379,13 @@ async def delete_alert(id: str):
 
     result = await alert_collection.delete_one({"_id": ObjectId(id)})
     return result.deleted_count > 0
+
+
+async def fetch_devices():
+    devices = await mongo_client.list_database_names()
+    excluded_databases = ["admin", "config", "local", MONGODB_DB]
+    filtered_devices = [db for db in devices if db not in excluded_databases]
+    return filtered_devices
 
 
 async def get_latest_sensor_readings():

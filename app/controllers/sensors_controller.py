@@ -7,7 +7,7 @@ from fastapi.responses import JSONResponse
 
 from services.auth_service import get_current_user
 from services.scheduler_service import sensors_heartbeat
-from clients.mongodb_client import fetch_data, validate_connection
+from clients.mongodb_client import fetch_data, fetch_devices, validate_connection
 
 from utils.logger import logger
 from utils.consts import TIMEZONE
@@ -22,6 +22,14 @@ async def startup_event():
         await validate_connection()
     except Exception as e:
         logger.error(f"Failed to connect to MongoDB: {e}")
+
+
+@router.get("/devices")
+async def get_devices():
+    devices = await fetch_devices()
+    return Response(
+        status_code=200, content=json.dumps(devices, default=json_util.default)
+    )
 
 
 @router.get("/{device_id}")
