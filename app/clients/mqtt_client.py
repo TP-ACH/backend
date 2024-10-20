@@ -22,11 +22,11 @@ def on_connect(client, userdata, flags, reason_code, properties=None):
         logger.error(f"Failed to connect: {reason_code}. Retrying in 5 seconds")
     else:
         logger.info("Connected to broker")
-        client.subscribe(TEMP_TOPIC)
-        client.subscribe(HUMIDITY_TOPIC)
-        client.subscribe(PH_TOPIC)
-        client.subscribe(EC_TOPIC)
-        client.subscribe(FLOATER_TOPIC)
+        client.subscribe(TEMP_TOPIC, qos=1)
+        client.subscribe(HUMIDITY_TOPIC, qos=1)
+        client.subscribe(PH_TOPIC, qos=1)
+        client.subscribe(EC_TOPIC, qos=1)
+        client.subscribe(FLOATER_TOPIC, qos=1)
 
 
 def on_subscribe(client, userdata, mid, reason_code_list, properties=None):
@@ -85,5 +85,5 @@ class MQTTClient:
                 logger.error(f"Connection failed: {e}")
                 time.sleep(5)
 
-    def publish_message(self, topic, message):
-        self.client.publish(topic, message, qos=1)
+    def publish_message(self, topic, message, qos=1):
+        self.client.publish(topic, message, qos=qos)

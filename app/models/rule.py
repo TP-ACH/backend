@@ -42,5 +42,6 @@ class DefaultRuleBySpecies(BaseModel):
 
 class RulesByDevice(BaseModel):
     device: str
+    species: Optional[str] = None
     rules_by_sensor: Optional[List[RuleBySensor]] = None
     light_hours: Optional[LightRule] = None
