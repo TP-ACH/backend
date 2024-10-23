@@ -113,8 +113,9 @@ def execute_sensor_rules(device_id: str, sensor: str, reading):
     sensor_rules = RuleBySensor(**rules)
 
     for rule in sensor_rules.rules:
-        if evaluate_rule(device_id, sensor, rule, reading):
-            execute_action(device_id, sensor, rule.action, reading, rule.bound)
+        if rule.enabled:
+            if evaluate_rule(device_id, sensor, rule, reading):
+                execute_action(device_id, sensor, rule.action, reading, rule.bound)
 
     return True
 
