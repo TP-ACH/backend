@@ -103,6 +103,7 @@ def create_light_rule(start, end):
     return {
         "start": start,
         "end": end,
+        "enabled": 1,
     }
 
 
