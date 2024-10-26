@@ -76,7 +76,7 @@ def create_temperature_and_humidity_rules():
     ]
 
 
-def create_floater_rule(floater):
+def create_floater_rule():
     return [
         {
             "sensor": "floater",
