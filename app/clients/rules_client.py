@@ -103,7 +103,7 @@ def validate_rule_bounds(metric, upper, lower):
 
 async def read_device_rules(device_id: str):
     rules = await get_device_rules(device_id)
-    return RulesByDevice(**rules)
+    return RulesByDevice(**rules) if rules else None
 
 
 def execute_sensor_rules(device_id: str, sensor: str, reading):
