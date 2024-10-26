@@ -32,7 +32,7 @@ scheduler.start()
 logger.info("Scheduler started")
 
 
-def schedule_light_cycle(device_id, start_time, end_time):
+def schedule_light_cycle(device_id, start_time, end_time, enabled=True):
     try:
         start_time = datetime.strptime(start_time, "%H:%M").time()
         end_time = datetime.strptime(end_time, "%H:%M").time()
@@ -47,29 +47,30 @@ def schedule_light_cycle(device_id, start_time, end_time):
     except JobLookupError:
         logger.warning(f"No job by the id of off_{device_id} was found")
 
-    scheduler.add_job(
-        turn_on_light,
-        "cron",
-        hour=start_time.hour,
-        minute=start_time.minute,
-        second=start_time.second,
-        timezone=timezone,
-        args=[device_id],
-        id=f"on_{device_id}",
-    )
+    if enabled:
+        scheduler.add_job(
+            turn_on_light,
+            "cron",
+            hour=start_time.hour,
+            minute=start_time.minute,
+            second=start_time.second,
+            timezone=timezone,
+            args=[device_id],
+            id=f"on_{device_id}",
+        )
 
-    scheduler.add_job(
-        turn_off_light,
-        "cron",
-        hour=end_time.hour,
-        minute=end_time.minute,
-        second=end_time.second,
-        timezone=timezone,
-        args=[device_id],
-        id=f"off_{device_id}",
-    )
+        scheduler.add_job(
+            turn_off_light,
+            "cron",
+            hour=end_time.hour,
+            minute=end_time.minute,
+            second=end_time.second,
+            timezone=timezone,
+            args=[device_id],
+            id=f"off_{device_id}",
+        )
 
-    logger.info(f"Light cycle scheduled to start at {start_time} and end at {end_time}")
+        logger.info(f"Light cycle scheduled to start at {start_time} and end at {end_time}")
 
 
 def turn_on_light(device_id):

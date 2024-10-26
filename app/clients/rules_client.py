@@ -56,13 +56,13 @@ async def add_device_rules(rules: RulesByDevice):
     result = await update_rules_by_device(rules)
     if result and rules.light_hours is not None:
         schedule_light_cycle(
-            rules.device, rules.light_hours.start, rules.light_hours.end
+            rules.device, rules.light_hours.start, rules.light_hours.end, rules.light_hours.enabled
         )
     return True
 
 
 def validate_rules(rules: RulesByDevice):
-    if rules.light_hours is not None:
+    if rules.light_hours is not None and rules.light_hours.enabled is not False:
         if not validate_rule_bounds(
             "light_hours", rules.light_hours.start, rules.light_hours.end
         ):

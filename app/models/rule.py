@@ -19,6 +19,7 @@ class Rule(BaseModel):
 class LightRule(BaseModel):
     start: str
     end: str
+    enabled: bool
 
     @validator("start", "end")
     def validate_time(cls, value):
