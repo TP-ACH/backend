@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, status
 from fastapi.responses import JSONResponse
 
 from utils.species import Species
@@ -16,23 +16,25 @@ from clients.rules_client import (
 router = APIRouter(dependencies=[Depends(get_current_user)])
 
 
-@router.post("/default")
+@router.post("/default", include_in_schema=False)
 async def init_rules():
+    """Only to be used when the default rules for each plants needs to be changed or initialized."""
     if await init_species_rules():
         return JSONResponse(
-            status_code=200, content={"message": "Default rules set successfully"}
+            status_code=status.HTTP_200_OK, content={"message": "Default rules set successfully"}
         )
     return JSONResponse(
-        status_code=500, content={"message": "Error setting default rules"}
+        status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, content={"message": "Error setting default rules"}
     )
 
 
-@router.get("/default", response_model=DefaultRuleBySpecies)
-async def get_default_rules(species: Species):
+@router.get("/default")
+async def get_default_rules(species: Species) -> DefaultRuleBySpecies:
+    """Get the default rules for a given species."""
     rules = await get_default_species_rules(species)
     if not rules:
         return JSONResponse(
-            status_code=404,
+            status_code=status.HTTP_404_NOT_FOUND,
             content={"message": f"No default rules found for {species.value}"},
         )
     return rules
@@ -40,30 +42,33 @@ async def get_default_rules(species: Species):
 
 @router.put("/device")
 async def add_device_rule(rules: RulesByDevice):
+    """Add or update rules for a device."""
     update = await add_device_rules(rules)
     if update:
         return JSONResponse(
-            status_code=200, content={"message": "Rules updated successfully"}
+            status_code=status.HTTP_200_OK, content={"message": "Rules updated successfully"}
         )
     return JSONResponse(
-        status_code=500,
+        status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
         content={"message": f"Error updating rules for device {rules.device}"},
     )
 
 
 @router.get("/device", response_model=RulesByDevice)
 async def get_device_rules(device_id: str):
+    """Get all the rules set for the given device."""
     rules = await read_device_rules(device_id)
     if not rules:
         return JSONResponse(
-            status_code=404,
+            status_code=status.HTTP_404_NOT_FOUND,
             content={"message": f"No rules found for device {device_id}"},
         )
     return rules
 
 
-@router.get("/species", response_model=List[Species])
-async def get_species():
+@router.get("/species")
+async def get_species() -> List[Species]:
+    """Get all the species available."""
     return JSONResponse(
-        status_code=200, content={"species": [species.value for species in Species]}
+        status_code=status.HTTP_200_OK, content={"species": [species.value for species in Species]}
     )
