@@ -16,6 +16,9 @@ services:
       - redis
       - celery
     restart: unless-stopped
+    networks:
+      - cleverleafy
+      - default
 
   mqtt5:
     image: eclipse-mosquitto
@@ -80,3 +83,8 @@ services:
 
 volumes:
   config:
+
+networks:
+  cleverleafy:
+    name: cleverleafy
+    driver: bridge

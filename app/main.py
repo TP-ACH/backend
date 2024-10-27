@@ -18,7 +18,7 @@ app = FastAPI(docs_url=None)
 security = HTTPBasic()
 
 origins = [
-    APP_URL,
+    "*",
 ]
 
 app.add_middleware(
