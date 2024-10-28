@@ -29,6 +29,12 @@ class UserUpdate(BaseModel):
     password: Optional[str] = None
 
 
+class UserUpdateRequest(BaseModel):
+    first_name: Optional[str] = None
+    last_name: Optional[str] = None
+    old_password: Optional[str] = None
+    new_password: Optional[str] = None
+
 class UserResponse(BaseModel):
     username: str
     first_name: str
