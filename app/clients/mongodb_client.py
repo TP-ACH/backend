@@ -108,12 +108,13 @@ async def insert_user(user: User):
 async def update_user(user: User, user_update: User):
     db = mongo_client.get_database(MONGODB_DB)
     user_collection = db.get_collection("users")
-    updated_user_data = user_update.dict(exclude_unset=True)
+    updated_user_data = user_update.model_dump(exclude_none=True)
     updated_user = await user_collection.find_one_and_update(
         {"username": user.username},
         {"$set": updated_user_data},
         return_document=ReturnDocument.AFTER,
     )
+
     return User(**updated_user) if updated_user else None
 
 
