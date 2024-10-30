@@ -11,7 +11,6 @@ from controllers.alerts_controller import router as alerts_router
 from controllers.sensors_controller import router as sensors_router
 from services.auth_service import generate_token
 
-APP_URL = os.getenv("APP_URL")
 
 tags_metadata = [
     {
@@ -52,13 +51,9 @@ app = FastAPI(
 
 security = HTTPBasic()
 
-origins = [
-    APP_URL,
-]
-
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins,
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
