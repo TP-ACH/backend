@@ -2,9 +2,9 @@ import json
 import pytz
 import datetime
 from bson import json_util
-from fastapi import Response, APIRouter, Depends
+from fastapi import Response, APIRouter, Depends, status
 from fastapi.responses import JSONResponse
-
+from typing import List
 from services.auth_service import get_current_user
 from services.scheduler_service import sensors_heartbeat
 from clients.mongodb_client import fetch_data, fetch_devices, validate_connection
@@ -25,10 +25,11 @@ async def startup_event():
 
 
 @router.get("/devices")
-async def get_devices():
+async def get_devices() -> List[str]:
+    """Get the list of the devices available."""
     devices = await fetch_devices()
     return Response(
-        status_code=200, content=json.dumps(devices, default=json_util.default)
+        status_code=status.HTTP_200_OK, content=json.dumps(devices, default=json_util.default)
     )
 
 
@@ -38,7 +39,8 @@ async def get_device_data(
     sensor: str | None = None,
     start_date: datetime.datetime | None = None,
     end_date: datetime.datetime | None = None,
-):
+) -> dict:
+    """Get entries with the given filters for a specific device."""
     query = {}
     tz = pytz.timezone(TIMEZONE)
     if start_date:
@@ -54,8 +56,8 @@ async def get_device_data(
         data_entries = await fetch_data(device_id, sensor, query)
     except Exception as e:
         return JSONResponse(
-            status_code=500, content={"message": f"Failed to fetch data: {str(e)}"}
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, content={"message": f"Failed to fetch data: {str(e)}"}
         )
     return Response(
-        status_code=200, content=json.dumps(data_entries, default=json_util.default)
+        status_code=status.HTTP_200_OK, content=json.dumps(data_entries, default=json_util.default)
     )

@@ -12,7 +12,42 @@ from controllers.sensors_controller import router as sensors_router
 from services.auth_service import generate_token
 
 
-app = FastAPI(docs_url=None)
+tags_metadata = [
+    {
+        "name": "Auth",
+        "description": "Operations for users authentication.",
+    },
+    {
+        "name": "Users",
+        "description": "Operations for users management.",
+    },
+    {
+        "name": "Alerts",
+        "description": "Operations for alerts management.",
+    },
+    {
+        "name": "Rules",
+        "description": "Operations for rules management.",
+    },
+    {
+        "name": "Sensors",
+        "description": "Operations for sensors management.",
+    },
+]
+
+app = FastAPI(
+    title="Cleverleafy",
+    description="CleverLeafy API helps you with your hydroponic garden by automating tasks and sending alerts when needed.",
+    summary="API for the automation of your hydroponic gardens.",
+    version="0.0.1",
+    license_info={
+        "name": "Apache 2.0",
+        "url": "https://www.apache.org/licenses/LICENSE-2.0.html",
+    },
+    openapi_tags=tags_metadata, 
+    docs_url=None,
+)
+
 
 security = HTTPBasic()
 
@@ -30,13 +65,13 @@ app.include_router(mqtt_router, prefix="/mqtt")
 app.include_router(auth_router, prefix="/auth", tags=["Auth"])
 
 # APP routes
-app.include_router(sensors_router, prefix="/sensors", tags=["App"])
-app.include_router(rules_router, prefix="/rules", tags=["App"])
-app.include_router(alerts_router, prefix="/alerts", tags=["App"])
-app.include_router(users_router, prefix="/users", tags=["App"])
+app.include_router(sensors_router, prefix="/sensors", tags=["Sensors"])
+app.include_router(rules_router, prefix="/rules", tags=["Rules"])
+app.include_router(alerts_router, prefix="/alerts", tags=["Alerts"])
+app.include_router(users_router, prefix="/users", tags=["Users"])
 
 
-@app.get("/")
+@app.get("/", include_in_schema=False)
 def read_root():
     return {"Hello": "World"}
 

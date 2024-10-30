@@ -8,8 +8,9 @@ from utils.logger import logger
 router = APIRouter(dependencies=[Depends(get_current_user)])
 
 
-@router.get("/me", response_model=UserResponse)
-async def get_user_info(user=Depends(get_current_user)):
+@router.get("/me")
+async def get_user_info(user=Depends(get_current_user)) -> UserResponse:
+    """Retrieves the user's non private information."""
     return UserResponse(
         username=user.username,
         first_name=user.first_name,
@@ -17,8 +18,9 @@ async def get_user_info(user=Depends(get_current_user)):
     )
 
 
-@router.put("/update", response_model=UserResponse)
-async def update_user_info(user_update: UserUpdateRequest, user=Depends(get_current_user)):
+@router.put("/update")
+async def update_user_info(user_update: UserUpdateRequest, user=Depends(get_current_user)) -> UserResponse:
+    """Updates the user's information. Current password is needed. """
     if user_update.new_password:
         if not user_update.old_password:
             raise HTTPException(

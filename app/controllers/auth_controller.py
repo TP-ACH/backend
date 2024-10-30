@@ -16,6 +16,7 @@ router = APIRouter()
 
 @router.post("/register")
 async def register_user(new_user: UserRegister):
+    """Create a new user."""
     new_user_data = new_user.user
     user = await get_user(new_user_data.username)
 
@@ -34,12 +35,13 @@ async def register_user(new_user: UserRegister):
     new_user_data.password = get_password_hash(new_user_data.password)
     await insert_user(new_user_data)
 
-    return Response(status_code=201)
+    return Response(status_code=status.HTTP_201_CREATED)
 
 
-@router.post("/login", response_model=Token)
+@router.post("/login")
 async def login_for_access_token(
     form_data: Annotated[OAuth2PasswordRequestForm, Depends()],
 ) -> Token:
+    """Login to get an access token. To be used for the other endpoints."""
     access_token = await generate_token(form_data.username, form_data.password)
     return Token(access_token=access_token, token_type="bearer")
