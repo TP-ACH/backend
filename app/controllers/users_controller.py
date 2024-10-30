@@ -19,8 +19,10 @@ async def get_user_info(user=Depends(get_current_user)) -> UserResponse:
 
 
 @router.put("/update")
-async def update_user_info(user_update: UserUpdateRequest, user=Depends(get_current_user)) -> UserResponse:
-    """Updates the user's information. Current password is needed. """
+async def update_user_info(
+    user_update: UserUpdateRequest, user=Depends(get_current_user)
+) -> UserResponse:
+    """Updates the user's information. Current password is needed."""
     if user_update.new_password:
         if not user_update.old_password:
             raise HTTPException(
