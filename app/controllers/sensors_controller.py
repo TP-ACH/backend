@@ -29,7 +29,8 @@ async def get_devices() -> List[str]:
     """Get the list of the devices available."""
     devices = await fetch_devices()
     return Response(
-        status_code=status.HTTP_200_OK, content=json.dumps(devices, default=json_util.default)
+        status_code=status.HTTP_200_OK,
+        content=json.dumps(devices, default=json_util.default),
     )
 
 
@@ -56,8 +57,10 @@ async def get_device_data(
         data_entries = await fetch_data(device_id, sensor, query)
     except Exception as e:
         return JSONResponse(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, content={"message": f"Failed to fetch data: {str(e)}"}
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            content={"message": f"Failed to fetch data: {str(e)}"},
         )
     return Response(
-        status_code=status.HTTP_200_OK, content=json.dumps(data_entries, default=json_util.default)
+        status_code=status.HTTP_200_OK,
+        content=json.dumps(data_entries, default=json_util.default),
     )

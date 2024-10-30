@@ -40,7 +40,8 @@ async def change_alert_status(id: str, new_status: Status):
             content={"message": f"No alert found with id {id}"},
         )
     return JSONResponse(
-        status_code=status.HTTP_200_OK, content={"message": "Alert updated successfully"}
+        status_code=status.HTTP_200_OK,
+        content={"message": "Alert updated successfully"},
     )
 
 
@@ -54,5 +55,6 @@ async def remove_alert(id: str):
             content={"message": f"No alert found with id {id}"},
         )
     return JSONResponse(
-        status_code=status.HTTP_404_NOT_FOUND, content={"message": "Alert deleted successfully"}
+        status_code=status.HTTP_404_NOT_FOUND,
+        content={"message": "Alert deleted successfully"},
     )

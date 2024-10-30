@@ -44,7 +44,7 @@ app = FastAPI(
         "name": "Apache 2.0",
         "url": "https://www.apache.org/licenses/LICENSE-2.0.html",
     },
-    openapi_tags=tags_metadata, 
+    openapi_tags=tags_metadata,
     docs_url=None,
 )
 
@@ -75,10 +75,11 @@ app.include_router(users_router, prefix="/users", tags=["Users"])
 def read_root():
     return {"Hello": "World"}
 
-@app.get("/docs",include_in_schema=False)
+
+@app.get("/docs", include_in_schema=False)
 async def get_documentation(credentials: HTTPBasicCredentials = Depends(security)):
     access_token = await generate_token(credentials.username, credentials.password)
-    if not access_token:    
+    if not access_token:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Incorrect username or password",

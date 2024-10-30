@@ -70,7 +70,9 @@ def schedule_light_cycle(device_id, start_time, end_time, enabled=True):
             id=f"off_{device_id}",
         )
 
-        logger.info(f"Light cycle scheduled to start at {start_time} and end at {end_time}")
+        logger.info(
+            f"Light cycle scheduled to start at {start_time} and end at {end_time}"
+        )
 
 
 def turn_on_light(device_id):

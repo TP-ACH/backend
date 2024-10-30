@@ -21,10 +21,12 @@ async def init_rules():
     """Only to be used when the default rules for each plants needs to be changed or initialized."""
     if await init_species_rules():
         return JSONResponse(
-            status_code=status.HTTP_200_OK, content={"message": "Default rules set successfully"}
+            status_code=status.HTTP_200_OK,
+            content={"message": "Default rules set successfully"},
         )
     return JSONResponse(
-        status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, content={"message": "Error setting default rules"}
+        status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+        content={"message": "Error setting default rules"},
     )
 
 
@@ -46,7 +48,8 @@ async def add_device_rule(rules: RulesByDevice):
     update = await add_device_rules(rules)
     if update:
         return JSONResponse(
-            status_code=status.HTTP_200_OK, content={"message": "Rules updated successfully"}
+            status_code=status.HTTP_200_OK,
+            content={"message": "Rules updated successfully"},
         )
     return JSONResponse(
         status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
@@ -70,5 +73,6 @@ async def get_device_rules(device_id: str):
 async def get_species() -> List[Species]:
     """Get all the species available."""
     return JSONResponse(
-        status_code=status.HTTP_200_OK, content={"species": [species.value for species in Species]}
+        status_code=status.HTTP_200_OK,
+        content={"species": [species.value for species in Species]},
     )
