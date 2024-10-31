@@ -13,8 +13,6 @@ services:
     depends_on:
       - mqtt5
       - mongo
-      - redis
-      - celery
     restart: unless-stopped
     networks:
       - cleverleafy
@@ -46,40 +44,6 @@ services:
       - ./mongodb/mongo_data:/data/db
       - ./mongodb/init-mongo.js:/docker-entrypoint-initdb.d/init-mongo.js
     restart: unless-stopped
-
-  redis:
-    image: redis:latest
-    container_name: redis
-    ports:
-      - "6379:6379"
-    restart: unless-stopped
-
-  celery:
-    build: .
-    command: celery -A celery_app.celery_app worker --loglevel=info
-    volumes:
-      - ./app:/app
-    env_file:
-      - .env
-    depends_on:
-      - redis
-      - mongo
-    restart: unless-stopped
-
-  flower:
-    container_name: flower
-    build: .
-    command: celery -A celery_app.celery_app flower --port=5555
-    volumes:
-      - ./app:/app
-    env_file:
-      - .env
-    ports:
-      - 5555:5555
-    depends_on:
-      - fastapi
-      - redis
-      - celery
 
 volumes:
   config:

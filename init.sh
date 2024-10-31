@@ -20,7 +20,6 @@ fi
 declare -A USERS
 USERS=(
   ["fastapi"]="fastapi"
-  ["celery"]="celery"
   ["arduino"]="arduino"
 )
 
