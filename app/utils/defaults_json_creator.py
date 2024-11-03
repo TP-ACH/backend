@@ -33,20 +33,20 @@ def create_rule(sensor, lower_bound, upper_bound, lower_action, upper_action):
     }
 
 
-def create_temperature_and_humidity_rules():
+def create_temperature_and_humidity_rules(humidity_lower_bound, humidity_upper_bound, temp_lower_bound, temp_upper_bound):
     return [
         {
             "sensor": "temperature",
             "rules": [
                 {
-                    "bound": 25,
+                    "bound": temp_lower_bound,
                     "compare": "less",
                     "time": 5,
                     "enabled": 1,
                     "action": {"type": "alert", "dest": Topic.TEMPERATURE_DOWN.value},
                 },
                 {
-                    "bound": 30,
+                    "bound": temp_upper_bound,
                     "compare": "greater",
                     "time": 5,
                     "enabled": 1,
@@ -58,14 +58,14 @@ def create_temperature_and_humidity_rules():
             "sensor": "humidity",
             "rules": [
                 {
-                    "bound": 25,
+                    "bound": humidity_lower_bound,
                     "compare": "less",
                     "time": 5,
                     "enabled": 1,
                     "action": {"type": "alert", "dest": Topic.HUMIDITY_DOWN.value},
                 },
                 {
-                    "bound": 30,
+                    "bound": humidity_upper_bound,
                     "compare": "greater",
                     "time": 5,
                     "enabled": 1,
@@ -118,6 +118,10 @@ def process_csv_to_json(csv_file="data/plants_defaults.csv"):
             ph_upper = float(row["ph_upper"])
             ec_lower = float(row["ec_lower"])
             ec_upper = float(row["ec_upper"])
+            humidity_lower = float(row["humidty_lower"])
+            humidity_upper = float(row["humidty_upper"])
+            temperature_lower = float(row["temperature_lower"])
+            temperature_upper = float(row["temperature_upper"])
             light_hours_start = str(row["light_hours_start"])
             light_hours_end = str(row["light_hours_end"])
 
@@ -131,7 +135,7 @@ def process_csv_to_json(csv_file="data/plants_defaults.csv"):
                         "ec", ec_lower, ec_upper, PUMP_NUTRIENT_TOPIC, PUMP_WATER_TOPIC
                     ),
                 ]
-                + create_temperature_and_humidity_rules()
+                + create_temperature_and_humidity_rules(humidity_lower, humidity_upper, temperature_lower, temperature_upper)
                 + create_floater_rule(),
                 "light_hours": create_light_rule(light_hours_start, light_hours_end),
             }
@@ -139,10 +143,3 @@ def process_csv_to_json(csv_file="data/plants_defaults.csv"):
             plants_data.append(plant_rules)
 
     return json.dumps(plants_data, indent=4)
-
-
-# csv_file = "app/data/plants_defaults.csv"
-# json_data = process_csv_to_json(csv_file)
-
-# with open("plants_data.json", "w") as json_file:
-#     json_file.write(json_data)
