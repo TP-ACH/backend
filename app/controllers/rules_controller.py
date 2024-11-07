@@ -2,6 +2,7 @@ from fastapi import APIRouter, Depends, status
 from fastapi.responses import JSONResponse
 
 from utils.species import Species
+from utils.logger import logger
 from models.rule import RulesByDevice, DefaultRuleBySpecies
 from services.auth_service import get_current_user
 from typing import List
@@ -15,30 +16,24 @@ from clients.rules_client import (
 
 router = APIRouter(dependencies=[Depends(get_current_user)])
 
-
-@router.post("/default", include_in_schema=False)
-async def init_rules():
-    """Only to be used when the default rules for each plants needs to be changed or initialized."""
-    if await init_species_rules():
-        return JSONResponse(
-            status_code=status.HTTP_200_OK,
-            content={"message": "Default rules set successfully"},
-        )
-    return JSONResponse(
-        status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-        content={"message": "Error setting default rules"},
-    )
-
-
 @router.get("/default")
 async def get_default_rules(species: Species) -> DefaultRuleBySpecies:
     """Get the default rules for a given species."""
     rules = await get_default_species_rules(species)
     if not rules:
-        return JSONResponse(
-            status_code=status.HTTP_404_NOT_FOUND,
-            content={"message": f"No default rules found for {species.value}"},
-        )
+        logger.info(f"No rules found for {species.value}. Initializing default rules.")
+        if await init_species_rules():
+            rules = await get_default_species_rules(species)
+            if not rules:
+                return JSONResponse(
+                    status_code=status.HTTP_404_NOT_FOUND,
+                    content={"message": f"No default rules found for {species.value}"},
+                )
+        else:
+            return JSONResponse(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                content={"message": "Error setting default rules"},
+            )
     return rules
 
 
