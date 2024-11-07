@@ -1,6 +1,6 @@
 from pydantic import BaseModel, Field
 from typing import Optional
-from utils.alerts import Type, Status, Topic, TOPIC_MESSAGES, TOPIC_TYPE_MAP
+from utils.alerts import Type, Status, Topic, TOPIC_MESSAGES, TOPIC_TYPE_MAP, TOPIC_TITLES
 from bson import ObjectId
 
 
@@ -25,12 +25,13 @@ class DBAlert(BaseModel):
 
 
 class Alert(DBAlert):
+    title: str
     message: str
 
     @classmethod
     def from_db_alert(cls, db_alert: DBAlert) -> "Alert":
         return cls(
-            **db_alert.dict(by_alias=True), message=TOPIC_MESSAGES[db_alert.topic]
+            **db_alert.dict(by_alias=True), title= TOPIC_TITLES[db_alert.topic], message=TOPIC_MESSAGES[db_alert.topic]
         )
 
 
