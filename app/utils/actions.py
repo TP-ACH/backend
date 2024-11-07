@@ -29,4 +29,4 @@ class Action(Enum):
         logger.info(
             f"Sending alert to {action.dest}. Reading: {reading}, Bound: {bound}"
         )
-        sync_create_new_alert(DBAlert.from_topic(device_id, Topic(action.dest.rsplit('/', 1)[0].lower())))
+        sync_create_new_alert(DBAlert.from_topic(device_id, Topic(action.dest.rsplit('/', 1)[-1].lower())))

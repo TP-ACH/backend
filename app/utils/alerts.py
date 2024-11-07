@@ -22,8 +22,8 @@ class Topic(Enum):
     TEMPERATURE_FAIL = "temperature_fail"  # El sensor de temperatura no funciona
     PH_UP = "ph_up"  # El valor de Ph esta bajo
     PH_DOWN = "ph_down"  # El valor de Ph es elevado
-    EC_UP = "water"  # El valor de EC esta elevado
-    EC_DOWN = "nutrient"  # El valor de EC es bajo
+    EC_UP = "nutrient"  # El valor de EC esta elevado
+    EC_DOWN = "water"  # El valor de EC es bajo
     HUMIDITY_UP = "humidity_up"  # Hay mucha humedad en el ambiente
     HUMIDITY_DOWN = "humidity_down"  # Hay poca humedad en el ambiente
     TEMPERATURE_UP = "temperature_up"  # La temperatura esta elevada
@@ -72,8 +72,8 @@ TOPIC_TITLES = {
     Topic.TEMPERATURE_DOWN: "Temperature low",
     Topic.LIGHTS_OFF: "Lights off",
     Topic.LIGHTS_ON: "Lights on",
-    Topic.PH_OK: "pH ok",
-    Topic.EC_OK: "Nutrients ok",
+    Topic.PH_OK: "pH are being stabilized",
+    Topic.EC_OK: "Nutrients are being stabilized",
     Topic.WATER_DOWN: "Water low",
 }
 
