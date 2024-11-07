@@ -20,10 +20,10 @@ class Topic(Enum):
     EC_FAIL = "ec_fail"  # El sensor de EC no funciona
     HUMIDITY_FAIL = "humidity_fail"  # El sensor de humedad no funciona
     TEMPERATURE_FAIL = "temperature_fail"  # El sensor de temperatura no funciona
-    PH_UP = "ph_up"  # El valor de Ph esta elevado
-    PH_DOWN = "ph_down"  # El valor de Ph es bajo
-    EC_UP = "ec_up"  # El valor de EC esta elevado
-    EC_DOWN = "ec_down"  # El valor de EC es bajo
+    PH_UP = "ph_up"  # El valor de Ph esta bajo
+    PH_DOWN = "ph_down"  # El valor de Ph es elevado
+    EC_UP = "water"  # El valor de EC esta elevado
+    EC_DOWN = "nutrient"  # El valor de EC es bajo
     HUMIDITY_UP = "humidity_up"  # Hay mucha humedad en el ambiente
     HUMIDITY_DOWN = "humidity_down"  # Hay poca humedad en el ambiente
     TEMPERATURE_UP = "temperature_up"  # La temperatura esta elevada
@@ -41,10 +41,10 @@ TOPIC_MESSAGES = {
     Topic.EC_FAIL: "Connection with the EC sensor lost",
     Topic.HUMIDITY_FAIL: "Connection with the humidity sensor lost",
     Topic.TEMPERATURE_FAIL: "Connection with the temperature sensor lost",
-    Topic.PH_UP: "The pH value is above the acceptable range",
-    Topic.PH_DOWN: "The pH value is below the acceptable range",
-    Topic.EC_UP: "The EC value is above the acceptable range",
-    Topic.EC_DOWN: "The EC value is below the acceptable range",
+    Topic.PH_UP: "The pH value is below the acceptable range",
+    Topic.PH_DOWN: "The pH value is above the acceptable range",
+    Topic.EC_UP: "The EC value is below the acceptable range",
+    Topic.EC_DOWN: "The EC value is above the acceptable range",
     Topic.HUMIDITY_UP: "The humidity level is above the acceptable range",
     Topic.HUMIDITY_DOWN: "The humidity level is below the acceptable range",
     Topic.TEMPERATURE_UP: "The temperature is above the acceptable range",
@@ -62,10 +62,10 @@ TOPIC_TITLES = {
     Topic.EC_FAIL: "Nutrients sensor failed",
     Topic.HUMIDITY_FAIL: "Humidity sensor failed",
     Topic.TEMPERATURE_FAIL: "Temperature sensor failed",
-    Topic.PH_UP: "PH high",
-    Topic.PH_DOWN: "PH low",
-    Topic.EC_UP: "Nutrients high",
-    Topic.EC_DOWN: "Nutrients low",
+    Topic.PH_UP: "PH low",
+    Topic.PH_DOWN: "PH high",
+    Topic.EC_UP: "Nutrients low",
+    Topic.EC_DOWN: "Nutrients high",
     Topic.HUMIDITY_UP: "Humidity high",
     Topic.HUMIDITY_DOWN: "Humidity low",
     Topic.TEMPERATURE_UP: "Temperature high",
