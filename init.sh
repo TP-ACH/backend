@@ -7,6 +7,8 @@ PWFILE="/mosquitto/config/pwfile"
 DB_DIR="./mosquitto/data"
 DB_FILE="$DB_DIR/mosquitto.db"
 
+mkdir ./app/logs
+
 if [ ! -d "$DB_DIR" ]; then
     mkdir -p "$DB_DIR"
 fi
