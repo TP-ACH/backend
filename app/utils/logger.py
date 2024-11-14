@@ -6,7 +6,7 @@ logger.setLevel(logging.DEBUG)
 
 # Create handlers for logging to the standard output and a file
 stdoutHandler = logging.StreamHandler(stream=sys.stdout)
-errHandler = logging.FileHandler("error.log")
+errHandler = logging.FileHandler("logs/error.log")
 
 # Set the log levels on the handlers
 stdoutHandler.setLevel(logging.DEBUG)
